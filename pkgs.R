@@ -13,9 +13,9 @@ zip_info <- do.call(rbind,
 zip_info <- as.data.frame(zip_info) %>% set_names(c('zipfile','basename','version'))
 basenames <- str_extract(zips, '^[A-Za-z0-9\\.]+')
 
-installed_pkgs <- read_csv('Documentation_Private/package.csv')
+installed_pkgs <- read_csv('data/package.csv')
 
-pkg_wish <- read_csv('Documentation_Private/pkg_wish.txt', col_names = FALSE)
+pkg_wish <- read_csv('data/pkg_wish.txt', col_names = FALSE)
 deps <- tools::package_dependencies(pkg_wish$X1, recursive = T)
 top_pkgs <- names(deps)
 deps <- unlist(deps)
@@ -35,7 +35,7 @@ pkgs_for_install <- setdiff(deps, installed_pkgs$Package)
 # pkgs_for_install <- setdiff(needed_pkgs, installed_pkgs$Package)
 
 zips_to_download <- zips[basenames %in% pkgs_for_install]
-setwd('pkgs_for_download/')
+if(!fs::dir_exists('pkgs_for_download')) fs::dir_create('pkgs_for_download')
 for (z in zips_to_download){
   print(z)
   URL <- paste0(theurl, z)
