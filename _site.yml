@@ -16,7 +16,7 @@ navbar:
   right:
     - icon: fa-github
       text: GitHub
-      href: https://github.com/araastat/BIOF339_PracticalR/tree/gh-pages
+      href: https://github.com/araastat/FSI_Workshop
 output:
   html_document:
     theme: cosmo
