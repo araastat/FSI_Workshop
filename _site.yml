@@ -1,0 +1,24 @@
+name: "PS 312 (Foreign Service Institute)"
+output_dir: "docs"
+navbar:
+  title: "Programming with R"
+  left:
+    - text: "Home"
+      href: index.html
+    - text: Syllabus
+      href: syllabus1.html
+    - text: Instructor bio
+      href: bio.html
+    - text: Lectures
+      href: lectures.html
+    - text: Resources
+      href: resources.html
+  right:
+    - icon: fa-github
+      text: GitHub
+      href: https://github.com/araastat/BIOF339_PracticalR/tree/gh-pages
+output:
+  html_document:
+    theme: cosmo
+    highlight: textmate
+    css: styles.css
