@@ -4,7 +4,7 @@
     <title>Getting started with R</title>
     <meta charset="utf-8">
     <meta name="author" content="Abhijit Dasgupta" />
-    <link href="StartingR_files/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="site_libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link rel="stylesheet" href="robot.css" type="text/css" />
     <link rel="stylesheet" href="robot-fonts.css" type="text/css" />
   </head>
@@ -236,7 +236,489 @@ class: middle,center
   - You'll be left scratching your head about what you wrote
   - Been there, done that.
   
--
+---
+
+# Conventions
+
+- I like `pothole_case`, i.e. joining words with underscores
+  - Traditionally you'd join with `.`, but this is more readable to me
+- Some people like `CamelCase`
+- You can make different objects just by changing case
+  - `staffing_data`, `Staffing_data`, `Staffing_Data`,`StaffingData`,
+  `staffing.data`, `staffing_Data` can all be unambiguously different objects
+  - Create your own system to figure out how to name things
+
+--
+
+&gt; Finding a good name is hard, but often worth the effort
+
+---
+
+# Writing code
+
+- You want to create a "story" for the data using R
+- Scripts make the story reproducible and verifiable and transferable to other data
+
+--
+
+- Your first scripts will be sloppy
+- Think about the writer; lot's of things in the trash
+- With practice, this will get smoother
+
+---
+class: center, middle
+
+# R Objects
+
+
+---
+
+# Objects
+
+- Everything in R is an object
+- There are two broad classes of objects: data objects (nouns) and functions (verbs)
+
+---
+
+# Data Objects
+
+- `data.frame` or `tibble`: These are rectangular data sets much like you would see in a spreadsheet
+- `vector`: This is a 1-dimensional list of numbers or strings (words in the language sense), but all must be of the same kind (number or string)
+- `matrix`: This is a 2-dimensional list of numbers or strings, once again all of the same type
+- A single number or word
+- `list`: This is a catch-all bucket. Each element of a list can be literally any valid R object. So they could be `tibble`'s, or functions, or matrices, and different elements can be of different types.
+
+---
+
+# Data objects
+
+- Most objects we'll use in this workshop are going to be `data.frame` or `tibble` objects. 
+  - In case you're wondering, they're basically the same thing, but `tibble`'s have some modest additional functionality 
+- R comes with a bunch of built-in datasets stored as `data.frame`s. 
+
+---
+class: middle, center
+
+# Data Frames
+
+---
+
+
+```r
+as_tibble(mtcars)
+```
+
+```
+## # A tibble: 32 x 11
+##      mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb
+##    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+##  1  21       6  160    110  3.9   2.62  16.5     0     1     4     4
+##  2  21       6  160    110  3.9   2.88  17.0     0     1     4     4
+##  3  22.8     4  108     93  3.85  2.32  18.6     1     1     4     1
+##  4  21.4     6  258    110  3.08  3.22  19.4     1     0     3     1
+##  5  18.7     8  360    175  3.15  3.44  17.0     0     0     3     2
+##  6  18.1     6  225    105  2.76  3.46  20.2     1     0     3     1
+##  7  14.3     8  360    245  3.21  3.57  15.8     0     0     3     4
+##  8  24.4     4  147.    62  3.69  3.19  20       1     0     4     2
+##  9  22.8     4  141.    95  3.92  3.15  22.9     1     0     4     2
+## 10  19.2     6  168.   123  3.92  3.44  18.3     1     0     4     4
+## # … with 22 more rows
+```
+
+- We have columns which are variable
+- Rows are observations
+- You can see what kind of variable each column is (in a `tibble`)
+
+---
+
+# Characteristics of data frames
+
+
+```r
+dim(mtcars)
+```
+
+```
+## [1] 32 11
+```
+
+```r
+rownames(mtcars)
+```
+
+```
+##  [1] "Mazda RX4"           "Mazda RX4 Wag"       "Datsun 710"         
+##  [4] "Hornet 4 Drive"      "Hornet Sportabout"   "Valiant"            
+##  [7] "Duster 360"          "Merc 240D"           "Merc 230"           
+## [10] "Merc 280"            "Merc 280C"           "Merc 450SE"         
+## [13] "Merc 450SL"          "Merc 450SLC"         "Cadillac Fleetwood" 
+## [16] "Lincoln Continental" "Chrysler Imperial"   "Fiat 128"           
+## [19] "Honda Civic"         "Toyota Corolla"      "Toyota Corona"      
+## [22] "Dodge Challenger"    "AMC Javelin"         "Camaro Z28"         
+## [25] "Pontiac Firebird"    "Fiat X1-9"           "Porsche 914-2"      
+## [28] "Lotus Europa"        "Ford Pantera L"      "Ferrari Dino"       
+## [31] "Maserati Bora"       "Volvo 142E"
+```
+
+```r
+names(mtcars)
+```
+
+```
+##  [1] "mpg"  "cyl"  "disp" "hp"   "drat" "wt"   "qsec" "vs"   "am"   "gear"
+## [11] "carb"
+```
+
+---
+
+# Characteristics of data frames
+
+- Each of the calls on the previous slide produce _bona fide_ objects in R. 
+- You can assign names to these objects to store them for future use.
+
+
+```r
+car_names &lt;- rownames(mtcars)
+```
+
+---
+
+# Extracting elements
+
+Data frames act like matrices
+
+
+```r
+mtcars[3, 4] # extracts from 3rd row, 4th column
+```
+
+```r
+mtcars[,4] # extracts 4th column
+```
+
+
+```r
+mtcars[3,] # extracts 3rd row
+```
+
+Each of these are, in turn, R objects, so you can assign names to them to store.
+
+---
+
+# Extracting elements
+
+We can see the overall structure of the data frame
+
+
+```r
+str(mtcars)
+```
+
+```
+## 'data.frame':	32 obs. of  11 variables:
+##  $ mpg : num  21 21 22.8 21.4 18.7 18.1 14.3 24.4 22.8 19.2 ...
+##  $ cyl : num  6 6 4 6 8 6 8 4 4 6 ...
+##  $ disp: num  160 160 108 258 360 ...
+##  $ hp  : num  110 110 93 110 175 105 245 62 95 123 ...
+##  $ drat: num  3.9 3.9 3.85 3.08 3.15 2.76 3.21 3.69 3.92 3.92 ...
+##  $ wt  : num  2.62 2.88 2.32 3.21 3.44 ...
+##  $ qsec: num  16.5 17 18.6 19.4 17 ...
+##  $ vs  : num  0 0 1 1 0 1 0 1 1 1 ...
+##  $ am  : num  1 1 1 0 0 0 0 0 0 0 ...
+##  $ gear: num  4 4 4 3 3 3 3 4 4 4 ...
+##  $ carb: num  4 4 1 1 2 1 4 2 2 4 ...
+```
+
+- `data.frame` with 32 rows and 11 colums
+- each column is a variable
+- each variable is numeric
+
+---
+
+# Extracting elements by name
+
+You can extract columns out by name in 3 ways
+
+- `mtcars[,'mpg']` (matrix notation)
+- `mtcars$mpg` (a shortcut, allows tab-completion)
+- `mtcars[['mpg']]` (list notation)
+
+A `data.frame` is really a `list`, so list extractions using `[[]]` work, either by 
+index or by name.
+
+--
+
+The first and third options allow for extracting more than one column
+
+
+```r
+mtcars[,c('mpg','hp')]
+mtcars[[c('mpg','hp')]]
+```
+
+The `c()` function stands for _concatenate_, and creates vectors.
+
+---
+
+# Exercise
+
+Fisher's iris dataset is in-built in R with the name `iris`.
+
+1. Determine how many observations and variables are in the dataset
+1. What are the variable names?
+1. What are the row names?
+1. Extract the sepal length and petal widths out and save them in new objects
+
+---
+class: middle,center
+
+# R packages
+
+---
+
+# Packages
+
+- The power of the R ecosystem comes from packages
+
+![](img/cran.png)
+
+CRAN is the Comprehensive R Archive Network, the central repository of R packages
+- CRAN has strict software criteria and testing to ensure usability (though not correctness)
+- Packages may also reside on Github, or other curated repositories like Bioconductor
+
+---
+
+# Finding packages
+
+![](img/TaskView.png)
+
+---
+
+# Finding packages
+
+- [R-Bloggers](http://www.r-bloggers.com)
+- [Twitter #rstats](https://twitter.com/hashtag/rstats)
+- [RSeek](http://r-seek.org)
+
+---
+
+# Installing R packages
+
+![](img/pkgs.png)
+
+
+```r
+install.packages(&lt;package name&gt;, repos='https://cran.rstudio.com')
+```
+
+You can set the default repository in RStudio using `Tools &gt; Global Options`.
+
+---
+
+# Installing R packages
+
+The Packages pane 
+
+![](img/pkg2.png)
+
+---
+
+# Exercise
+
+Install the `rio` package using any of the methods mentioned
+
+---
+
+# The `tidyverse` meta-package
+
+Includes
+
+- readr (reading data from text files)
+- tidyr (Manipulation, pivoting)
+- dplyr (summarize, aggregate, filter)
+- ggplot2 (visualization)
+- purrr (functions applied across data structures, meta-programming)
+- stringr (string manipulation)
+- forcats (categorical data)
+
+---
+class: middle, center
+
+# Importing data
+
+---
+
+# Data
+
+R can access data files from a wide variety of sources. These include
+
+1. Text files (csv, tsv, fixed-width)
+1. Microsoft Excel files
+1. Microsoft Access databases
+1. SQL-based databases (MySql, Postgresql, SQLite, Amazon Redshift)
+1. Enterprise databases (SAP, Oracle)
+
+---
+
+# The `rio` package
+
+The `rio` package wraps many other packages to make importing and exporting data easy
+
+It is great for importing and exporting non-database files that sit either on your computer or on
+the internet
+
+Importing the data will create an object called a data.frame, but if you
+just import data, it is not saved since it doesn't yet have a name.
+
+
+```r
+library(rio) # activate the package
+import('data/HR_Data.csv') # can use single or double quotes
+```
+
+So every time you import data, you have to name it. You do this using the `&lt;-` operator. 
+
+
+```r
+library(rio)
+hr_data &lt;- import('data/HR_Data.csv')
+```
+
+---
+
+# Checking out the data
+
+
+```r
+head(hr_data)
+```
+
+```
+##                                                Bureau Gender Grade
+## 1    Comptroller and Global Financial Services (CGFS) female   N/A
+## 2                East Asian and Pacific Affairs (EAP) female   N/A
+## 3                 Overseas Buildings Operations (OBO)   male  FS-5
+## 4         Conflict and Stabilization Operations (CSO)   male   N/A
+## 5                               Consular Affairs (CA) female  FS-5
+## 6 Management Policy, Rightsizing and Innovation (PRI) female  FS-2
+##             Name
+## 1  Katrina Lilly
+## 2          Keene
+## 3 Garrett Murphy
+## 4     Jim Rhodes
+## 5    Anita Myers
+## 6 Vivian Einhorn
+##                                                                                           Skills
+## 1                                   Hydrology, Research, Design, human resources, Administration
+## 2                                                                           Sharepoint, Planning
+## 3                interagency, Portuguese, Management, Foreign Policy, Economics, Human Resources
+## 4                   education, seo, German, Finance, design, portuguese, disease response, Excel
+## 5 Healthcare, training, German, french, Sharepoint, Marketing, Data Analysis, Economics, spanish
+## 6                 data analysis, Web Development, Hydrology, IT, SEO, Disease Response, Japanese
+##   YearsService
+## 1           16
+## 2           21
+## 3            5
+## 4            4
+## 5           23
+## 6           19
+```
+
+---
+
+# Checking out the data
+
+
+```r
+View(hr_data)
+```
+
+![](img/Viewer.png)
+
+---
+
+# Finer control of CSV imports
+
+
+```r
+hr_data &lt;- import('data/HR_Data.csv', check.names = TRUE)
+```
+
+This ensures that the names of the variables are proper
+
+
+```r
+hr_data &lt;- import('data/HR_Data.csv', check.names = TRUE, dec = ',')
+```
+This allows European data to be correctly entered. 
+
+---
+
+# Finer control of Excel imports
+
+You can specify sheet names or sheet positions for import from an Excel file. If you 
+know the sheet name, you can specify it using the `which` option:
+
+
+```r
+dos_data &lt;- import('data/simulatedDOS.xlsx', which='Staffing_by_Bureau')
+```
+
+You can also grab the same sheet by position:
+
+
+```r
+dos_data &lt;- import('data/simulatedDOS.xlsx', which = 2)
+```
+
+&gt; See the help file for `import` by typing `?import` in the console or searching in the Help pane
+
+---
+class: center, middle
+
+# Importing from databases
+
+---
+
+# Access databases
+
+
+```r
+library(RODBC) # activate package, case-sensitive
+channel &lt;- odbcConnectAccess('C:/Documents/Name_of_Access_Database') # change to your
+mydata &lt;- sqlQuery(channel, paste("select * from Name_of_table_in_database"))
+```
+
+---
+
+# SQL-based databases
+
+
+```r
+library(odbc)
+con &lt;- dbConnect(odbc(),
+                 Driver   = "[your driver's name]",
+                 Server   = "[your server's path]",
+                 Database = "[your database's name]",
+                 UID      = rstudioapi::askForPassword("Database user"),
+                 PWD      = rstudioapi::askForPassword("Database password"),
+                 Port     = 1433)
+```
+
+and you can load a table into R using
+
+
+```r
+dat &lt;- dbGetQuery(con, 'select * from &lt;table name&gt;')
+```
+
+---
+
+# Reading from databases
+
+[RStudio's tutorial](https://db.rstudio.com/)
+
+![](img/db.png)
     </textarea>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
 <script>var slideshow = remark.create({

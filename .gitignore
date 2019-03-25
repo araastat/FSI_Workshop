@@ -4,3 +4,7 @@
 .Ruserdata
 Documentation_Private/*
 pkgs_for_download/*
+docs/pkgs_for_download/*
+data/*
+docs/data/*
+docs/Documentation_Private/*

@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Data munging</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Abhijit Dasgupta" />
+    <link href="site_libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link rel="stylesheet" href="robot.css" type="text/css" />
+    <link rel="stylesheet" href="robot-fonts.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Data munging
+### Abhijit Dasgupta
+### March 25-27, 2019
+
+---
+
+
+
+
+layout: true
+
+&lt;div class="my-header"&gt;
+&lt;span&gt;PS 312, March 2019&lt;/span&gt;&lt;/div&gt;
+
+---
+class: middle, center
+
+# Tidy data
+
+---
+
+# Make the computer happy
+
+Just as we want code to make humans happy, we want data to make computers happy
+
+Tidy data is a principle promoted by Dr. Hadley Wickham to make computers happy
+
+--
+
+The properties of a tidy dataset are:
+
+1. Each variable forms a column
+1. Each observation forms a row
+1. Each type of observational unit forms a table. 
+
+This forms a standardized way to structure a dataset, and so makes it easy for the 
+analyst to develop standard pipelines. 
+
+---
+class: center, middle
+
+## A tidy dataset is tidy in one way, but a messy dataset can be messy in many ways
+
+&lt;span style='text-align:right;font-size:30pt;'&gt;Hadley Wickham&lt;/span&gt;
+
+---
+
+# Messy data
+
+A dataset can be messy in many many ways. Many of the more common issues are listed below:
+
+- Column names contain values, not just variable names
+- Multiple variables are stored in one column
+- Variables are stored in both rows and columns
+- Multiple types of observational types are stored in the same table
+- A single observational unit is stored in multiple tables
+
+Sometimes the messier format is better for data entry, but bad for data analyses. 
+
+
+---
+
+# Variables in column names
+
+
+```r
+library(tidyverse)
+pew &lt;- import('data/pew.csv')
+head(pew, 4)
+```
+
+```
+##   religion &lt;$10k $10-20k $20-30k $30-40k $40-50k $50-75k $75-100k
+## 1 Agnostic    27      34      60      81      76     137      122
+## 2  Atheist    12      27      37      52      35      70       73
+## 3 Buddhist    27      21      30      34      33      58       62
+## 4 Catholic   418     617     732     670     638    1116      949
+##   $100-150k &gt;150k Don't know/refused
+## 1       109    84                 96
+## 2        59    74                 76
+## 3        39    53                 54
+## 4       792   633               1489
+```
+
+- This dataset has actual data in the column headers, rather than variable names. 
+- We should ideally have 3 columns in this dataset: religion, income and frequency. 
+- We can achieve this using a function called `gather` which takes a wide dataset and makes it tall. 
+
+---
+
+.left-column[
+- Gather all the columns into two columns, `income` and `frequency`, by stacking the columns
+- Don't include the variable `religion`
+]
+.right-column[
+
+```r
+pew %&gt;% 
+  gather(income, frequency, -religion)
+```
+
+```
+##                    religion             income frequency
+## 1                  Agnostic              &lt;$10k        27
+## 2                   Atheist              &lt;$10k        12
+## 3                  Buddhist              &lt;$10k        27
+## 4                  Catholic              &lt;$10k       418
+## 5        Don’t know/refused              &lt;$10k        15
+## 6          Evangelical Prot              &lt;$10k       575
+## 7                     Hindu              &lt;$10k         1
+## 8   Historically Black Prot              &lt;$10k       228
+## 9         Jehovah's Witness              &lt;$10k        20
+## 10                   Jewish              &lt;$10k        19
+## 11            Mainline Prot              &lt;$10k       289
+## 12                   Mormon              &lt;$10k        29
+## 13                   Muslim              &lt;$10k         6
+## 14                 Orthodox              &lt;$10k        13
+## 15          Other Christian              &lt;$10k         9
+## 16             Other Faiths              &lt;$10k        20
+## 17    Other World Religions              &lt;$10k         5
+## 18             Unaffiliated              &lt;$10k       217
+## 19                 Agnostic            $10-20k        34
+## 20                  Atheist            $10-20k        27
+## 21                 Buddhist            $10-20k        21
+## 22                 Catholic            $10-20k       617
+## 23       Don’t know/refused            $10-20k        14
+## 24         Evangelical Prot            $10-20k       869
+## 25                    Hindu            $10-20k         9
+## 26  Historically Black Prot            $10-20k       244
+## 27        Jehovah's Witness            $10-20k        27
+## 28                   Jewish            $10-20k        19
+## 29            Mainline Prot            $10-20k       495
+## 30                   Mormon            $10-20k        40
+## 31                   Muslim            $10-20k         7
+## 32                 Orthodox            $10-20k        17
+## 33          Other Christian            $10-20k         7
+## 34             Other Faiths            $10-20k        33
+## 35    Other World Religions            $10-20k         2
+## 36             Unaffiliated            $10-20k       299
+## 37                 Agnostic            $20-30k        60
+## 38                  Atheist            $20-30k        37
+## 39                 Buddhist            $20-30k        30
+## 40                 Catholic            $20-30k       732
+## 41       Don’t know/refused            $20-30k        15
+## 42         Evangelical Prot            $20-30k      1064
+## 43                    Hindu            $20-30k         7
+## 44  Historically Black Prot            $20-30k       236
+## 45        Jehovah's Witness            $20-30k        24
+## 46                   Jewish            $20-30k        25
+## 47            Mainline Prot            $20-30k       619
+## 48                   Mormon            $20-30k        48
+## 49                   Muslim            $20-30k         9
+## 50                 Orthodox            $20-30k        23
+## 51          Other Christian            $20-30k        11
+## 52             Other Faiths            $20-30k        40
+## 53    Other World Religions            $20-30k         3
+## 54             Unaffiliated            $20-30k       374
+## 55                 Agnostic            $30-40k        81
+## 56                  Atheist            $30-40k        52
+## 57                 Buddhist            $30-40k        34
+## 58                 Catholic            $30-40k       670
+## 59       Don’t know/refused            $30-40k        11
+## 60         Evangelical Prot            $30-40k       982
+## 61                    Hindu            $30-40k         9
+## 62  Historically Black Prot            $30-40k       238
+## 63        Jehovah's Witness            $30-40k        24
+## 64                   Jewish            $30-40k        25
+## 65            Mainline Prot            $30-40k       655
+## 66                   Mormon            $30-40k        51
+## 67                   Muslim            $30-40k        10
+## 68                 Orthodox            $30-40k        32
+## 69          Other Christian            $30-40k        13
+## 70             Other Faiths            $30-40k        46
+## 71    Other World Religions            $30-40k         4
+## 72             Unaffiliated            $30-40k       365
+## 73                 Agnostic            $40-50k        76
+## 74                  Atheist            $40-50k        35
+## 75                 Buddhist            $40-50k        33
+## 76                 Catholic            $40-50k       638
+## 77       Don’t know/refused            $40-50k        10
+## 78         Evangelical Prot            $40-50k       881
+## 79                    Hindu            $40-50k        11
+## 80  Historically Black Prot            $40-50k       197
+## 81        Jehovah's Witness            $40-50k        21
+## 82                   Jewish            $40-50k        30
+## 83            Mainline Prot            $40-50k       651
+## 84                   Mormon            $40-50k        56
+## 85                   Muslim            $40-50k         9
+## 86                 Orthodox            $40-50k        32
+## 87          Other Christian            $40-50k        13
+## 88             Other Faiths            $40-50k        49
+## 89    Other World Religions            $40-50k         2
+## 90             Unaffiliated            $40-50k       341
+## 91                 Agnostic            $50-75k       137
+## 92                  Atheist            $50-75k        70
+## 93                 Buddhist            $50-75k        58
+## 94                 Catholic            $50-75k      1116
+## 95       Don’t know/refused            $50-75k        35
+## 96         Evangelical Prot            $50-75k      1486
+## 97                    Hindu            $50-75k        34
+## 98  Historically Black Prot            $50-75k       223
+## 99        Jehovah's Witness            $50-75k        30
+## 100                  Jewish            $50-75k        95
+## 101           Mainline Prot            $50-75k      1107
+## 102                  Mormon            $50-75k       112
+## 103                  Muslim            $50-75k        23
+## 104                Orthodox            $50-75k        47
+## 105         Other Christian            $50-75k        14
+## 106            Other Faiths            $50-75k        63
+## 107   Other World Religions            $50-75k         7
+## 108            Unaffiliated            $50-75k       528
+## 109                Agnostic           $75-100k       122
+## 110                 Atheist           $75-100k        73
+## 111                Buddhist           $75-100k        62
+## 112                Catholic           $75-100k       949
+## 113      Don’t know/refused           $75-100k        21
+## 114        Evangelical Prot           $75-100k       949
+## 115                   Hindu           $75-100k        47
+## 116 Historically Black Prot           $75-100k       131
+## 117       Jehovah's Witness           $75-100k        15
+## 118                  Jewish           $75-100k        69
+## 119           Mainline Prot           $75-100k       939
+## 120                  Mormon           $75-100k        85
+## 121                  Muslim           $75-100k        16
+## 122                Orthodox           $75-100k        38
+## 123         Other Christian           $75-100k        18
+## 124            Other Faiths           $75-100k        46
+## 125   Other World Religions           $75-100k         3
+## 126            Unaffiliated           $75-100k       407
+## 127                Agnostic          $100-150k       109
+## 128                 Atheist          $100-150k        59
+## 129                Buddhist          $100-150k        39
+## 130                Catholic          $100-150k       792
+## 131      Don’t know/refused          $100-150k        17
+## 132        Evangelical Prot          $100-150k       723
+## 133                   Hindu          $100-150k        48
+## 134 Historically Black Prot          $100-150k        81
+## 135       Jehovah's Witness          $100-150k        11
+## 136                  Jewish          $100-150k        87
+## 137           Mainline Prot          $100-150k       753
+## 138                  Mormon          $100-150k        49
+## 139                  Muslim          $100-150k         8
+## 140                Orthodox          $100-150k        42
+## 141         Other Christian          $100-150k        14
+## 142            Other Faiths          $100-150k        40
+## 143   Other World Religions          $100-150k         4
+## 144            Unaffiliated          $100-150k       321
+## 145                Agnostic              &gt;150k        84
+## 146                 Atheist              &gt;150k        74
+## 147                Buddhist              &gt;150k        53
+## 148                Catholic              &gt;150k       633
+## 149      Don’t know/refused              &gt;150k        18
+## 150        Evangelical Prot              &gt;150k       414
+## 151                   Hindu              &gt;150k        54
+## 152 Historically Black Prot              &gt;150k        78
+## 153       Jehovah's Witness              &gt;150k         6
+## 154                  Jewish              &gt;150k       151
+## 155           Mainline Prot              &gt;150k       634
+## 156                  Mormon              &gt;150k        42
+## 157                  Muslim              &gt;150k         6
+## 158                Orthodox              &gt;150k        46
+## 159         Other Christian              &gt;150k        12
+## 160            Other Faiths              &gt;150k        41
+## 161   Other World Religions              &gt;150k         4
+## 162            Unaffiliated              &gt;150k       258
+## 163                Agnostic Don't know/refused        96
+## 164                 Atheist Don't know/refused        76
+## 165                Buddhist Don't know/refused        54
+## 166                Catholic Don't know/refused      1489
+## 167      Don’t know/refused Don't know/refused       116
+## 168        Evangelical Prot Don't know/refused      1529
+## 169                   Hindu Don't know/refused        37
+## 170 Historically Black Prot Don't know/refused       339
+## 171       Jehovah's Witness Don't know/refused        37
+## 172                  Jewish Don't know/refused       162
+## 173           Mainline Prot Don't know/refused      1328
+## 174                  Mormon Don't know/refused        69
+## 175                  Muslim Don't know/refused        22
+## 176                Orthodox Don't know/refused        73
+## 177         Other Christian Don't know/refused        18
+## 178            Other Faiths Don't know/refused        71
+## 179   Other World Religions Don't know/refused         8
+## 180            Unaffiliated Don't know/refused       597
+```
+]
+
+---
+
+.pull-left[
+
+```r
+head(pew)
+```
+
+```
+##             religion &lt;$10k $10-20k $20-30k $30-40k $40-50k $50-75k
+## 1           Agnostic    27      34      60      81      76     137
+## 2            Atheist    12      27      37      52      35      70
+## 3           Buddhist    27      21      30      34      33      58
+## 4           Catholic   418     617     732     670     638    1116
+## 5 Don’t know/refused    15      14      15      11      10      35
+## 6   Evangelical Prot   575     869    1064     982     881    1486
+##   $75-100k $100-150k &gt;150k Don't know/refused
+## 1      122       109    84                 96
+## 2       73        59    74                 76
+## 3       62        39    53                 54
+## 4      949       792   633               1489
+## 5       21        17    18                116
+## 6      949       723   414               1529
+```
+]
+.pull-right[
+
+```r
+pew %&gt;% 
+  gather(income, frequency, -religion) %&gt;% head(20)
+```
+
+```
+##                   religion  income frequency
+## 1                 Agnostic   &lt;$10k        27
+## 2                  Atheist   &lt;$10k        12
+## 3                 Buddhist   &lt;$10k        27
+## 4                 Catholic   &lt;$10k       418
+## 5       Don’t know/refused   &lt;$10k        15
+## 6         Evangelical Prot   &lt;$10k       575
+## 7                    Hindu   &lt;$10k         1
+## 8  Historically Black Prot   &lt;$10k       228
+## 9        Jehovah's Witness   &lt;$10k        20
+## 10                  Jewish   &lt;$10k        19
+## 11           Mainline Prot   &lt;$10k       289
+## 12                  Mormon   &lt;$10k        29
+## 13                  Muslim   &lt;$10k         6
+## 14                Orthodox   &lt;$10k        13
+## 15         Other Christian   &lt;$10k         9
+## 16            Other Faiths   &lt;$10k        20
+## 17   Other World Religions   &lt;$10k         5
+## 18            Unaffiliated   &lt;$10k       217
+## 19                Agnostic $10-20k        34
+## 20                 Atheist $10-20k        27
+```
+
+]
+
+---
+
+# Multiple variables in column names
+
+
+```r
+tb &lt;- import('data/tb.csv') %&gt;% as_tibble()
+head(tb)
+```
+
+```
+## # A tibble: 6 x 22
+##   iso2   year   m04  m514  m014 m1524 m2534 m3544 m4554 m5564   m65    mu
+##   &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;
+## 1 AD     1989    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA
+## 2 AD     1990    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA
+## 3 AD     1991    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA
+## 4 AD     1992    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA
+## 5 AD     1993    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA
+## 6 AD     1994    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA
+## # … with 10 more variables: f04 &lt;int&gt;, f514 &lt;int&gt;, f014 &lt;int&gt;,
+## #   f1524 &lt;int&gt;, f2534 &lt;int&gt;, f3544 &lt;int&gt;, f4554 &lt;int&gt;, f5564 &lt;int&gt;,
+## #   f65 &lt;int&gt;, fu &lt;int&gt;
+```
+
+- column headers include both sex and age
+
+---
+
+
+```r
+tb %&gt;% 
+  gather(sex_age, n, -iso2, -year, -fu)
+```
+
+```
+## # A tibble: 109,611 x 5
+##    iso2   year    fu sex_age     n
+##    &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt;   &lt;int&gt;
+##  1 AD     1989    NA m04        NA
+##  2 AD     1990    NA m04        NA
+##  3 AD     1991    NA m04        NA
+##  4 AD     1992    NA m04        NA
+##  5 AD     1993    NA m04        NA
+##  6 AD     1994    NA m04        NA
+##  7 AD     1996    NA m04        NA
+##  8 AD     1997    NA m04        NA
+##  9 AD     1998    NA m04        NA
+## 10 AD     1999    NA m04        NA
+## # … with 109,601 more rows
+```
+
+---
+
+
+```r
+tb %&gt;% 
+  gather(sex_age, n, -iso2, -year, -fu, na.rm=T)
+```
+
+```
+## # A tibble: 35,478 x 5
+##    iso2   year    fu sex_age     n
+##    &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt;   &lt;int&gt;
+##  1 AD     2005     0 m04         0
+##  2 AD     2006     0 m04         0
+##  3 AD     2008     0 m04         0
+##  4 AE     2006    NA m04         0
+##  5 AE     2007    NA m04         0
+##  6 AE     2008     0 m04         0
+##  7 AG     2007    NA m04         0
+##  8 AL     2005     0 m04         0
+##  9 AL     2006     0 m04         1
+## 10 AL     2007     0 m04         0
+## # … with 35,468 more rows
+```
+
+---
+
+
+```r
+tb %&gt;% 
+  gather(sex_age, n, -iso2, -year, -fu, na.rm=T) %&gt;% 
+  separate(sex_age, c('sex','age'), sep=1) # by position
+```
+
+```
+## # A tibble: 35,478 x 6
+##    iso2   year    fu sex   age       n
+##    &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt; &lt;chr&gt; &lt;int&gt;
+##  1 AD     2005     0 m     04        0
+##  2 AD     2006     0 m     04        0
+##  3 AD     2008     0 m     04        0
+##  4 AE     2006    NA m     04        0
+##  5 AE     2007    NA m     04        0
+##  6 AE     2008     0 m     04        0
+##  7 AG     2007    NA m     04        0
+##  8 AL     2005     0 m     04        0
+##  9 AL     2006     0 m     04        1
+## 10 AL     2007     0 m     04        0
+## # … with 35,468 more rows
+```
+
+This still needs to be cleaned
+
+---
+
+# Variables stored in rows and columns
+
+
+```r
+weather &lt;- import('data/weather.csv') %&gt;% as_tibble()
+weather
+```
+
+```
+## # A tibble: 22 x 35
+##    id     year month element    d1    d2    d3    d4    d5    d6    d7
+##    &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+##  1 MX17…  2010     1 tmax       NA  NA    NA      NA  NA      NA    NA
+##  2 MX17…  2010     1 tmin       NA  NA    NA      NA  NA      NA    NA
+##  3 MX17…  2010     2 tmax       NA  27.3  24.1    NA  NA      NA    NA
+##  4 MX17…  2010     2 tmin       NA  14.4  14.4    NA  NA      NA    NA
+##  5 MX17…  2010     3 tmax       NA  NA    NA      NA  32.1    NA    NA
+##  6 MX17…  2010     3 tmin       NA  NA    NA      NA  14.2    NA    NA
+##  7 MX17…  2010     4 tmax       NA  NA    NA      NA  NA      NA    NA
+##  8 MX17…  2010     4 tmin       NA  NA    NA      NA  NA      NA    NA
+##  9 MX17…  2010     5 tmax       NA  NA    NA      NA  NA      NA    NA
+## 10 MX17…  2010     5 tmin       NA  NA    NA      NA  NA      NA    NA
+## # … with 12 more rows, and 24 more variables: d8 &lt;dbl&gt;, d9 &lt;lgl&gt;,
+## #   d10 &lt;dbl&gt;, d11 &lt;dbl&gt;, d12 &lt;lgl&gt;, d13 &lt;dbl&gt;, d14 &lt;dbl&gt;, d15 &lt;dbl&gt;,
+## #   d16 &lt;dbl&gt;, d17 &lt;dbl&gt;, d18 &lt;lgl&gt;, d19 &lt;lgl&gt;, d20 &lt;lgl&gt;, d21 &lt;lgl&gt;,
+## #   d22 &lt;lgl&gt;, d23 &lt;dbl&gt;, d24 &lt;lgl&gt;, d25 &lt;dbl&gt;, d26 &lt;dbl&gt;, d27 &lt;dbl&gt;,
+## #   d28 &lt;dbl&gt;, d29 &lt;dbl&gt;, d30 &lt;dbl&gt;, d31 &lt;dbl&gt;
+```
+
+---
+
+
+```r
+weather %&gt;% 
+* gather(day, temp, d1:d31)
+```
+
+```
+## # A tibble: 682 x 6
+##    id       year month element day    temp
+##    &lt;chr&gt;   &lt;int&gt; &lt;int&gt; &lt;chr&gt;   &lt;chr&gt; &lt;dbl&gt;
+##  1 MX17004  2010     1 tmax    d1       NA
+##  2 MX17004  2010     1 tmin    d1       NA
+##  3 MX17004  2010     2 tmax    d1       NA
+##  4 MX17004  2010     2 tmin    d1       NA
+##  5 MX17004  2010     3 tmax    d1       NA
+##  6 MX17004  2010     3 tmin    d1       NA
+##  7 MX17004  2010     4 tmax    d1       NA
+##  8 MX17004  2010     4 tmin    d1       NA
+##  9 MX17004  2010     5 tmax    d1       NA
+## 10 MX17004  2010     5 tmin    d1       NA
+## # … with 672 more rows
+```
+
+`d1:d31` denotes all the variables physically between `d1` and `d31` in the dataset
+
+&gt; See what happens when you type `1:10` in the console
+
+---
+
+
+```r
+weather %&gt;% 
+  gather(date, temp, d1:d31) %&gt;% 
+* spread(element, temp)
+```
+
+```
+## # A tibble: 341 x 6
+##    id       year month date   tmax  tmin
+##    &lt;chr&gt;   &lt;int&gt; &lt;int&gt; &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt;
+##  1 MX17004  2010     1 d1       NA    NA
+##  2 MX17004  2010     1 d10      NA    NA
+##  3 MX17004  2010     1 d11      NA    NA
+##  4 MX17004  2010     1 d12      NA    NA
+##  5 MX17004  2010     1 d13      NA    NA
+##  6 MX17004  2010     1 d14      NA    NA
+##  7 MX17004  2010     1 d15      NA    NA
+##  8 MX17004  2010     1 d16      NA    NA
+##  9 MX17004  2010     1 d17      NA    NA
+## 10 MX17004  2010     1 d18      NA    NA
+## # … with 331 more rows
+```
+
+---
+class: middle, center
+
+# Data cleaning
+
+---
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightLanguage": "R",
+"countIncrementalSlides": false,
+"highlightStyle": "zenburn",
+"highlightLines": true,
+"slideNumberFormat": "%current%"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function() {
+  var d = document, s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})();</script>
+
+<script>
+(function() {
+  var i, text, code, codes = document.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+})();
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
