@@ -20,5 +20,4 @@ Last updated: `r format(Sys.time(), '%b %d, %Y (%l:%M%p %Z)')`
 
 # Getting in the weeds
 
-- [Data ingestion](StartingR.html)
 - [Data munging](Day1_DataMunging.html)
