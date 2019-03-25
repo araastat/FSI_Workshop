@@ -187,5 +187,637 @@ class: middle, center
 
 ---
 
+```{r}
+weather %>% 
+  gather(date, temp, d1:d31) %>% 
+  spread(element, temp) 
+```
 
+- date column in alphabetical rather than numerical order
+
+---
+
+```{r}
+weather %>% 
+  gather(date, temp, d1:d31) %>% 
+  spread(element, temp) %>% 
+  mutate(date = parse_number(date)) #<<
+```
+
+---
+
+```{r}
+weather %>% 
+  gather(date, temp, d1:d31) %>% 
+  spread(element, temp) %>% 
+  mutate(date = parse_number(date)) %>% 
+  arrange(date) #<<
+```
+
+Not quite! We'd like dates ordered within months
+
+---
+
+```{r}
+weather %>% 
+  gather(date, temp, d1:d31) %>% 
+  spread(element, temp) %>% 
+  mutate(date = parse_number(date)) %>% 
+  arrange(month, date) #<<
+```
+--
+Good. Now to save it
+
+```{r,eval = F}
+weather2 <- weather %>% 
+  gather(date, temp, d1:d31) %>% 
+  spread(element, temp) %>% 
+  mutate(date = parse_number(date)) %>% 
+  arrange(month, date)
+```
+
+---
+
+# Exercise
+
+The file `data/mbta.xlsx` contains monthly data on number of commuter trips by different modalities on the MBTA system n Boston. 
+
+- It is in a messy format. 
+- It also has an additional quirk in that it has a title on the first line that 
+isn't even data. You can avoid loading that in by using the option `skip=1` (i.e. skip the first line) when you
+import. 
+
+Work through this process to clean this dataset into tidy form. I'll also note that you can "minus" columns by 
+position as well as name, so `gather(date, avg_trips, -1, -mode)` is valid to not involve the first column and the `mode` column. 
+
+---
+
+```{r, echo = T, message=F}
+mbta <- import('data/mbta.xlsx', skip = 1) %>% as_tibble()
+mbta2 <- mbta %>% 
+  gather(date, avg_trips, -1, -mode) %>% 
+  separate(date, c("year", "month"), sep = '-')
+mbta2
+```
+--
+- `year`, `month`, `avg_trips` are all character variables
+- There is an odd column named `..1`
+- The rows with "All Modes by Qtr" and "TOTAL" aren't necessary
+
+---
+
+```{r}
+mbta2 %>% 
+  mutate(
+    year = parse_number(year),
+    month = parse_number(month),
+    avg_trips = parse_number(avg_trips)
+  )
+```
+
+---
+
+```{r}
+mbta2 %>% 
+  mutate(
+    year = parse_number(year),
+    month = parse_number(month),
+    avg_trips = parse_number(avg_trips)
+  ) %>% 
+  select(-1) #<<
+```
+
+---
+
+```{r}
+mbta2 %>% 
+  mutate(
+    year = parse_number(year),
+    month = parse_number(month),
+    avg_trips = parse_number(avg_trips)
+  ) %>% 
+  select(-1) %>% 
+  filter(mode != 'TOTAL', mode != "All Modes by Qtr") #<<
+```
+
+---
+
+# Other cleaning tasks
+
+1. `distinct()` keeps the unique (non-duplicate) rows of a dataset. Usage: `dataset %>% distinct()`
+1. If you want to keep only rows with complete data, you can invoke `drop_na`. Usage: `dataset %>% drop_na()`. You 
+can modify `drop_na` by specifying variables from which you want to drop the missing values. 
+1. If you want to convert a value to missing (commonly 99 is used for missing data), then you can use `replace_na` within `mutate` to change to missing values on a column-by-column basis. Usage: `dataset %>% mutate(var1 = na_if(var1, 99))`
+
+---
+class: middle, center
+
+# Cleaning Excel data
+
+---
+
+# Excel is used as a visual medium
+
+- Tables created to look good rather than being tidy or computer-friendly
+  - Color being used to denote values of some variables
+  - Multiple lines of headers
+  - Multiple rows with variables
+  - Typos leading to numeric variables become character
+  
+---
+
+# Excel is not reproducible, prone to mistakes by click
+
+- Two special cases of Excel errors in the press
+  - Duke cancer scandal with Dr. Anil Potti's group
+  - Reinhart & Rogoff models for economic growth
+
+- 35% of datasets in Nature (the journal) have Excel errors (The Economist, 2016)
+
+> A gene named `1MAR` is entered in Excel. What does it become?
+
+---
+
+![](img/ExcelClean.png)
+
+---
+
+.left-column[
+- Real data lies in the paired statistics and standard error columns
+- The headers are basically different groupings and categories and should be variables
+
+]
+.right-column[
+![](img/ExcelClean.png)
+]
+
+---
+
+.left-column[
+- `import` fails horribly
+- Two packages, `tidyxl` and `unpivotr`, by Duncan Garmonsway, save the day
+]
+.right-column[
+![](img/ExcelClean.png)
+]
+
+---
+
+```{r, warning=F}
+library(tidyxl)
+dataset1 <- xlsx_cells('data/attendance.xlsx')
+dataset1
+```
+
+- This grabs a bunch of meta-data about the Excel entries, including color and formatting features
+- The data has been blown up on a cell-by-cell basis
+- Use `tidyverse` tools to fix this? Nope. `unpivotr` is more powerful in this case.
+
+---
+
+```{r, message = F}
+library(unpivotr)
+dataset1 %>% 
+  filter(row != 1, row != 4, row < 65) %>% 
+  behead('N', tophead) %>% 
+  behead('N', head2) %>% 
+  behead('W', State) %>% 
+  select(row, col, data_type, numeric, tophead, head2, State)
+```
+
+- Pull off the two headers first with `behead`. Tell the function what direction (N, W, S, E or angles)
+the header is sitting in relation to the data
+- Pull off the first column with states, which is a "header" on the left
+- Show relevant columns
+
+---
+
+```{r, message = F}
+library(unpivotr)
+dataset1 %>% 
+  filter(row != 1, row != 4, row < 65) %>% 
+  behead('N', tophead) %>% 
+  behead('N', head2) %>% 
+  behead('W', State) %>% 
+  select(row, col, data_type, numeric, tophead, head2, State) %>% 
+  mutate(header = ifelse(col %% 2 == 0, 'stats','se'))
+```
+
+- even columns are stats, odd columns are standard errors
+- `%%` gives the remainder when left side is divided by right side
+
+---
+
+```{r, message = F}
+library(unpivotr)
+dataset1 %>% 
+  filter(row != 1, row != 4, row < 65) %>% 
+  behead('N', tophead) %>% 
+  behead('N', head2) %>% 
+  behead('W', State) %>% 
+  select(row, col, data_type, numeric, tophead, head2, State) %>% 
+  mutate(header = ifelse(col %% 2 == 0, 'stats','se')) %>% 
+  fill(tophead) %>% fill(head2)
+```
+
+- column headers spanned several columns visually, but rested in left-most column internally
+- used _last value carried forward_ to fill in the other columns
+---
+
+```{r, message = F}
+library(unpivotr)
+tidy_dataset <- dataset1 %>% 
+  filter(row != 1, row != 4, row < 65) %>% 
+  behead('N', tophead) %>% 
+  behead('N', head2) %>% 
+  behead('W', State) %>% 
+  select(row, col, data_type, numeric, tophead, head2, State) %>% 
+  mutate(header = ifelse(col %% 2 == 0, 'stats','se')) %>% 
+  fill(tophead) %>% fill(head2) %>% 
+  select(-col) %>% 
+  spatter(header, numeric) %>% #<<
+  select(-row)
+tidy_dataset
+```
+
+- `spatter` works like `spread`, but is more robust for this kind of weird data
+
+---
+
+```{r, message = F}
+tidy_dataset <- tidy_dataset %>% 
+  mutate(State = str_remove(State, '\\.+')) %>% #<<
+  mutate(State = str_trim(State))
+tidy_dataset
+```
+
+- We're using a __regular expression__ to identify and remove all the dots
+  - Rich tool for text searching
+- Next we trim away any white space that is around the string
+
+---
+
+# Save the data
+
+```{r}
+saveRDS(tidy_dataset, file = 'data/schools.rds')
+```
+
+The RDS format is an open standard and a fast way to store and retrieve datasets in R
+
+---
+class: middle, center
+
+# What about being colorful?
+
+---
+
+.pull-left[
+```{r}
+library(tidyxl)
+library(unpivotr)
+
+dataset2 <- xlsx_cells('data/classlist.xlsx')
+formats <- xlsx_formats('data/classlist.xlsx')
+```
+
+We need to grab the formats too, now
+
+```{r}
+format_id <- dataset2$local_format_id
+dataset2$font_color <- formats$local$font$color$rgb[format_id]
+dataset2$bg_color <- formats$local$fill$patternFill$fgColor$rgb[format_id]
+
+unique(dataset2$font_color)
+unique(dataset2$bg_color)
+
+```
+
+
+]
+.pull-right[
+![](img/classlist.png)
+]
+
+---
+
+# Grab the red rows
+
+
+```{r}
+red_rows <- dataset2 %>% filter(font_color=='FFFF0000') %>% 
+  select(row, col, data_type, character) %>% 
+  mutate(row=2, col = 1:8)
+headers <- dataset2 %>% filter(bg_color == 'FFFFC000') %>% 
+  select(row, col, data_type, character) %>% 
+  mutate(row = 1, col = 1:8)
+
+bind_rows(headers, red_rows) %>% 
+  behead('N', header) %>% 
+  select(-col) %>% 
+  spatter(header) %>% 
+  select(-row)
+```
+
+---
+
+# Tidying this data
+
+.pull-left[
+There are really two datasets interwoven here
+
+- The odd rows form one dataset
+- The even rows form another dataset
+
+We need to put these two datasets side-by-side
+]
+.pull-right[
+![](img/classlist.png)
+]
+
+---
+
+# Tidying this data
+
+.pull-left[
+```{r}
+dat1 <- dataset2 %>% 
+  filter( row %% 2 == 1) %>% # odd rows
+  behead('N', header) %>% 
+  mutate(row = (row+1)/2) # make the row numbers sequential
+
+dat2 <- dataset2 %>% 
+  filter(row %% 2 == 0) %>%  # even rows
+  behead('N', header) %>% 
+  mutate(row = row/2) %>% # make row numbers sequential
+  mutate(col = col+4) # These will be the last 4 cols of new data
+
+tidy_dataset2 <- 
+  rbind(dat1, dat2) %>% # Put datsets on top of each other
+  select(row, data_type, numeric, character, header) %>% 
+  spatter(header) %>% 
+  select(-row, -numeric)
+
+```
+
+]
+.pull-right[
+![](img/classlist.png)
+]
+
+---
+
+# Tidying this data
+
+.pull-left[
+```{r}
+dat1 <- dataset2 %>% 
+  filter( row %% 2 == 1) %>% # odd rows
+  behead('N', header) %>% 
+  mutate(row = (row+1)/2) # make the row numbers sequential
+
+dat2 <- dataset2 %>% 
+  filter(row %% 2 == 0) %>%  # even rows
+  behead('N', header) %>% 
+  mutate(row = row/2) %>% # make row numbers sequential
+  mutate(col = col+4) # These will be the last 4 cols of new data
+
+tidy_dataset2 <- 
+  rbind(dat1, dat2) %>% # Put datsets on top of each other
+  select(row, data_type, numeric, character, header) %>% 
+  spatter(header) %>% 
+  select(-row, -numeric)
+
+```
+
+]
+.pull-right[
+```{r, echo=F}
+tidy_dataset2
+```
+]
+
+---
+
+# Tidying this data
+
+```{r}
+tidy_dataset2 <- tidy_dataset2 %>% 
+  set_names(make.names(names(.))) %>%  #<<
+  select(Student.Name, everything())
+```
+
+```{r, echo=F}
+tidy_dataset2
+```
+
+---
+class: middle, center
+
+# Summarizing data
+
+---
+
+# The `dplyr` package
+
+This gives us 5 verbs for single data frames:
+
+- `filter`: filter a dataset by rows
+- `select`: select columns of a dataset
+- `arrange`: arrange rows of a dataset by values of some variables
+- `group_by`: split a dataset by values of some variables, so that we can apply verbs to each split
+- `summarize`: compute various summaries from the data
+
+---
+
+# The `dplyr` package
+
+.pull-left[
+Gives us verbs for joining 2 data frames:
+
+- `left_join`
+- `right_join`
+- `inner_join`
+- `outer_join`
+- `semi_join`
+- `anti_join`
+- `bind_rows`
+- `bind_cols`
+]
+.pull-right[
+The joins are different ways to merge two data sets which have at least one variable in common
+
+The `semi-join` and `anti-join` are really filters rather than joins
+
+The last two just put data frames together as long as they conform in dimension
+]
+
+---
+
+```{r}
+library(tidyverse)
+mtcars1 <- mtcars %>% rownames_to_column('cars') %>% as_tibble()
+mtcars1
+```
+--
+
+```{r}
+mtcars1 %>% summarize(mpg = mean(mpg, na.rm=T), disp = mean(disp, na.rm=T), hp = mean(hp, na.rm=T))
+```
+
+---
+
+# Scoped verbs
+
+All the `dplyr` verbs have scoped versions `*_all`, `*_at` and `*_if`.
+
+1. `*_all` : Act on all columns
+1.  `*_at`  : Act on specified columns
+1.  `*_if`  : Act on columns with specific property
+
+--
+```{r}
+mtcars1 %>% summarize_at(vars(mpg, disp, hp), mean, na.rm=T)
+```
+
+---
+
+# Factors (categorical variables)
+
+`factor` types of variables are discrete or categorical variables, that only take
+a small set of values. Think number of cylinders in a car, race, sex. 
+
+```{r}
+mtcars1 <- mtcars1 %>% 
+  mutate_at(vars(cyl, vs, am, gear, carb), as.factor)
+str(mtcars1)
+```
+
+---
+
+# Means of numeric variables
+
+```{r}
+mtcars1 %>% summarize_if(is.numeric, mean)
+```
+
+
+---
+
+# Summarize the variables
+
+```{r}
+summary(mtcars1)
+```
+
+---
+class: middle, center
+
+
+# Split-Apply-Combine
+
+---
+
+![](img/split-apply-combine.png)
+
+---
+
+# Grouped summaries
+
+```{r}
+mtcars1 %>% 
+  group_by(cyl) %>% 
+  summarize(mpg_mean = mean(mpg))
+```
+
+---
+
+# Grouped summaries
+```{r}
+mtcars1 %>% 
+  group_by(cyl) %>% 
+  summarize_if(is.numeric, mean)
+```
+
+---
+
+# Grouped summaries
+
+```{r}
+mtcars1 %>% 
+  group_by(cyl) %>% 
+  summarize_if(is.numeric, list('mean' = mean, 'median' = median))
+```
+
+---
+
+# Violence in West Africa
+
+```{r}
+west_africa <- import('data/2000-01-01-2019-01-01-Western_Africa.csv')
+west_africa %>% group_by(country, year) %>% tally()
+```
+
+---
+class: middle, center
+
+# Joins
+
+---
+
+![](img/joins.png)
+
+
+---
+
+# Some simulated data
+
+We simulated 2 datasets
+- real estate allocation at DOS by Bureau
+- staffing at DOS by Bureau
+
+We want to see what the average area per person is across DOS
+
+```{r}
+staffing_data <- import('data/Staffing_by_Bureau.csv')
+real_estate <- import('data/DoS_Real_Estate_Allocation.csv')
+```
+
+---
+
+```{r}
+staffing_data %>% as_tibble()
+real_estate %>% as_tibble()
+```
+
+---
+
+```{r, message=T}
+staff_summary <- staffing_data %>% 
+  group_by(Bureau) %>% 
+  tally(name = 'Pop')
+realestate_summary <- real_estate %>% 
+ group_by(Bureau) %>% summarize(Size = sum(Size))
+```
+```{r}
+staff_summary %>% head(4)
+realestate_summary %>% head(4)
+```
+
+---
+
+```{r}
+staff_summary %>% 
+  inner_join(realestate_summary, by = c("Bureau" = "Bureau"))
+```
+
+---
+
+```{r}
+staff_summary %>% 
+  inner_join(realestate_summary, by = c("Bureau" = "Bureau")) %>% 
+  mutate(unit_area = Size/Pop) %>% 
+  arrange(unit_area)
+
+```
 

@@ -553,6 +553,1187 @@ class: middle, center
 # Data cleaning
 
 ---
+
+
+```r
+weather %&gt;% 
+  gather(date, temp, d1:d31) %&gt;% 
+  spread(element, temp) 
+```
+
+```
+## # A tibble: 341 x 6
+##    id       year month date   tmax  tmin
+##    &lt;chr&gt;   &lt;int&gt; &lt;int&gt; &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt;
+##  1 MX17004  2010     1 d1       NA    NA
+##  2 MX17004  2010     1 d10      NA    NA
+##  3 MX17004  2010     1 d11      NA    NA
+##  4 MX17004  2010     1 d12      NA    NA
+##  5 MX17004  2010     1 d13      NA    NA
+##  6 MX17004  2010     1 d14      NA    NA
+##  7 MX17004  2010     1 d15      NA    NA
+##  8 MX17004  2010     1 d16      NA    NA
+##  9 MX17004  2010     1 d17      NA    NA
+## 10 MX17004  2010     1 d18      NA    NA
+## # … with 331 more rows
+```
+
+- date column in alphabetical rather than numerical order
+
+---
+
+
+```r
+weather %&gt;% 
+  gather(date, temp, d1:d31) %&gt;% 
+  spread(element, temp) %&gt;% 
+* mutate(date = parse_number(date))
+```
+
+```
+## # A tibble: 341 x 6
+##    id       year month  date  tmax  tmin
+##    &lt;chr&gt;   &lt;int&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+##  1 MX17004  2010     1     1    NA    NA
+##  2 MX17004  2010     1    10    NA    NA
+##  3 MX17004  2010     1    11    NA    NA
+##  4 MX17004  2010     1    12    NA    NA
+##  5 MX17004  2010     1    13    NA    NA
+##  6 MX17004  2010     1    14    NA    NA
+##  7 MX17004  2010     1    15    NA    NA
+##  8 MX17004  2010     1    16    NA    NA
+##  9 MX17004  2010     1    17    NA    NA
+## 10 MX17004  2010     1    18    NA    NA
+## # … with 331 more rows
+```
+
+---
+
+
+```r
+weather %&gt;% 
+  gather(date, temp, d1:d31) %&gt;% 
+  spread(element, temp) %&gt;% 
+  mutate(date = parse_number(date)) %&gt;% 
+* arrange(date)
+```
+
+```
+## # A tibble: 341 x 6
+##    id       year month  date  tmax  tmin
+##    &lt;chr&gt;   &lt;int&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+##  1 MX17004  2010     1     1    NA    NA
+##  2 MX17004  2010     2     1    NA    NA
+##  3 MX17004  2010     3     1    NA    NA
+##  4 MX17004  2010     4     1    NA    NA
+##  5 MX17004  2010     5     1    NA    NA
+##  6 MX17004  2010     6     1    NA    NA
+##  7 MX17004  2010     7     1    NA    NA
+##  8 MX17004  2010     8     1    NA    NA
+##  9 MX17004  2010    10     1    NA    NA
+## 10 MX17004  2010    11     1    NA    NA
+## # … with 331 more rows
+```
+
+Not quite! We'd like dates ordered within months
+
+---
+
+
+```r
+weather %&gt;% 
+  gather(date, temp, d1:d31) %&gt;% 
+  spread(element, temp) %&gt;% 
+  mutate(date = parse_number(date)) %&gt;% 
+* arrange(month, date)
+```
+
+```
+## # A tibble: 341 x 6
+##    id       year month  date  tmax  tmin
+##    &lt;chr&gt;   &lt;int&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+##  1 MX17004  2010     1     1    NA    NA
+##  2 MX17004  2010     1     2    NA    NA
+##  3 MX17004  2010     1     3    NA    NA
+##  4 MX17004  2010     1     4    NA    NA
+##  5 MX17004  2010     1     5    NA    NA
+##  6 MX17004  2010     1     6    NA    NA
+##  7 MX17004  2010     1     7    NA    NA
+##  8 MX17004  2010     1     8    NA    NA
+##  9 MX17004  2010     1     9    NA    NA
+## 10 MX17004  2010     1    10    NA    NA
+## # … with 331 more rows
+```
+--
+Good. Now to save it
+
+
+```r
+weather2 &lt;- weather %&gt;% 
+  gather(date, temp, d1:d31) %&gt;% 
+  spread(element, temp) %&gt;% 
+  mutate(date = parse_number(date)) %&gt;% 
+  arrange(month, date)
+```
+
+---
+
+# Exercise
+
+The file `data/mbta.xlsx` contains monthly data on number of commuter trips by different modalities on the MBTA system n Boston. 
+
+- It is in a messy format. 
+- It also has an additional quirk in that it has a title on the first line that 
+isn't even data. You can avoid loading that in by using the option `skip=1` (i.e. skip the first line) when you
+import. 
+
+Work through this process to clean this dataset into tidy form. I'll also note that you can "minus" columns by 
+position as well as name, so `gather(date, avg_trips, -1, -mode)` is valid to not involve the first column and the `mode` column. 
+
+---
+
+
+```r
+mbta &lt;- import('data/mbta.xlsx', skip = 1) %&gt;% as_tibble()
+mbta2 &lt;- mbta %&gt;% 
+  gather(date, avg_trips, -1, -mode) %&gt;% 
+  separate(date, c("year", "month"), sep = '-')
+mbta2
+```
+
+```
+## # A tibble: 638 x 5
+##      ..1 mode              year  month avg_trips
+##    &lt;dbl&gt; &lt;chr&gt;             &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;    
+##  1     1 All Modes by Qtr  2007  01    NA       
+##  2     2 Boat              2007  01    4        
+##  3     3 Bus               2007  01    335.819  
+##  4     4 Commuter Rail     2007  01    142.2    
+##  5     5 Heavy Rail        2007  01    435.294  
+##  6     6 Light Rail        2007  01    227.231  
+##  7     7 Pct Chg / Yr      2007  01    0.02     
+##  8     8 Private Bus       2007  01    4.772    
+##  9     9 RIDE              2007  01    4.9      
+## 10    10 Trackless Trolley 2007  01    12.757   
+## # … with 628 more rows
+```
+--
+- `year`, `month`, `avg_trips` are all character variables
+- There is an odd column named `..1`
+- The rows with "All Modes by Qtr" and "TOTAL" aren't necessary
+
+---
+
+
+```r
+mbta2 %&gt;% 
+  mutate(
+    year = parse_number(year),
+    month = parse_number(month),
+    avg_trips = parse_number(avg_trips)
+  )
+```
+
+```
+## # A tibble: 638 x 5
+##      ..1 mode               year month avg_trips
+##    &lt;dbl&gt; &lt;chr&gt;             &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;
+##  1     1 All Modes by Qtr   2007     1     NA   
+##  2     2 Boat               2007     1      4   
+##  3     3 Bus                2007     1    336.  
+##  4     4 Commuter Rail      2007     1    142.  
+##  5     5 Heavy Rail         2007     1    435.  
+##  6     6 Light Rail         2007     1    227.  
+##  7     7 Pct Chg / Yr       2007     1      0.02
+##  8     8 Private Bus        2007     1      4.77
+##  9     9 RIDE               2007     1      4.9 
+## 10    10 Trackless Trolley  2007     1     12.8 
+## # … with 628 more rows
+```
+
+---
+
+
+```r
+mbta2 %&gt;% 
+  mutate(
+    year = parse_number(year),
+    month = parse_number(month),
+    avg_trips = parse_number(avg_trips)
+  ) %&gt;% 
+* select(-1)
+```
+
+```
+## # A tibble: 638 x 4
+##    mode               year month avg_trips
+##    &lt;chr&gt;             &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;
+##  1 All Modes by Qtr   2007     1     NA   
+##  2 Boat               2007     1      4   
+##  3 Bus                2007     1    336.  
+##  4 Commuter Rail      2007     1    142.  
+##  5 Heavy Rail         2007     1    435.  
+##  6 Light Rail         2007     1    227.  
+##  7 Pct Chg / Yr       2007     1      0.02
+##  8 Private Bus        2007     1      4.77
+##  9 RIDE               2007     1      4.9 
+## 10 Trackless Trolley  2007     1     12.8 
+## # … with 628 more rows
+```
+
+---
+
+
+```r
+mbta2 %&gt;% 
+  mutate(
+    year = parse_number(year),
+    month = parse_number(month),
+    avg_trips = parse_number(avg_trips)
+  ) %&gt;% 
+  select(-1) %&gt;% 
+* filter(mode != 'TOTAL', mode != "All Modes by Qtr")
+```
+
+```
+## # A tibble: 522 x 4
+##    mode               year month avg_trips
+##    &lt;chr&gt;             &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;
+##  1 Boat               2007     1      4   
+##  2 Bus                2007     1    336.  
+##  3 Commuter Rail      2007     1    142.  
+##  4 Heavy Rail         2007     1    435.  
+##  5 Light Rail         2007     1    227.  
+##  6 Pct Chg / Yr       2007     1      0.02
+##  7 Private Bus        2007     1      4.77
+##  8 RIDE               2007     1      4.9 
+##  9 Trackless Trolley  2007     1     12.8 
+## 10 Boat               2007     2      3.6 
+## # … with 512 more rows
+```
+
+---
+
+# Other cleaning tasks
+
+1. `distinct()` keeps the unique (non-duplicate) rows of a dataset. Usage: `dataset %&gt;% distinct()`
+1. If you want to keep only rows with complete data, you can invoke `drop_na`. Usage: `dataset %&gt;% drop_na()`. You 
+can modify `drop_na` by specifying variables from which you want to drop the missing values. 
+1. If you want to convert a value to missing (commonly 99 is used for missing data), then you can use `replace_na` within `mutate` to change to missing values on a column-by-column basis. Usage: `dataset %&gt;% mutate(var1 = na_if(var1, 99))`
+
+---
+class: middle, center
+
+# Cleaning Excel data
+
+---
+
+# Excel is used as a visual medium
+
+- Tables created to look good rather than being tidy or computer-friendly
+  - Color being used to denote values of some variables
+  - Multiple lines of headers
+  - Multiple rows with variables
+  - Typos leading to numeric variables become character
+  
+---
+
+# Excel is not reproducible, prone to mistakes by click
+
+- Two special cases of Excel errors in the press
+  - Duke cancer scandal with Dr. Anil Potti's group
+  - Reinhart &amp; Rogoff models for economic growth
+
+- 35% of datasets in Nature (the journal) have Excel errors (The Economist, 2016)
+
+&gt; A gene named `1MAR` is entered in Excel. What does it become?
+
+---
+
+![](img/ExcelClean.png)
+
+---
+
+.left-column[
+- Real data lies in the paired statistics and standard error columns
+- The headers are basically different groupings and categories and should be variables
+
+]
+.right-column[
+![](img/ExcelClean.png)
+]
+
+---
+
+.left-column[
+- `import` fails horribly
+- Two packages, `tidyxl` and `unpivotr`, by Duncan Garmonsway, save the day
+]
+.right-column[
+![](img/ExcelClean.png)
+]
+
+---
+
+
+```r
+library(tidyxl)
+dataset1 &lt;- xlsx_cells('data/attendance.xlsx')
+dataset1
+```
+
+```
+## # A tibble: 1,173 x 21
+##    sheet address   row   col is_blank data_type error logical numeric
+##    &lt;chr&gt; &lt;chr&gt;   &lt;int&gt; &lt;int&gt; &lt;lgl&gt;    &lt;chr&gt;     &lt;chr&gt; &lt;lgl&gt;     &lt;dbl&gt;
+##  1 Tabl… A1          1     1 FALSE    character &lt;NA&gt;  NA           NA
+##  2 Tabl… B1          1     2 TRUE     blank     &lt;NA&gt;  NA           NA
+##  3 Tabl… C1          1     3 TRUE     blank     &lt;NA&gt;  NA           NA
+##  4 Tabl… D1          1     4 TRUE     blank     &lt;NA&gt;  NA           NA
+##  5 Tabl… E1          1     5 TRUE     blank     &lt;NA&gt;  NA           NA
+##  6 Tabl… F1          1     6 TRUE     blank     &lt;NA&gt;  NA           NA
+##  7 Tabl… G1          1     7 TRUE     blank     &lt;NA&gt;  NA           NA
+##  8 Tabl… H1          1     8 TRUE     blank     &lt;NA&gt;  NA           NA
+##  9 Tabl… I1          1     9 TRUE     blank     &lt;NA&gt;  NA           NA
+## 10 Tabl… J1          1    10 TRUE     blank     &lt;NA&gt;  NA           NA
+## # … with 1,163 more rows, and 12 more variables: date &lt;dttm&gt;,
+## #   character &lt;chr&gt;, character_formatted &lt;list&gt;, formula &lt;chr&gt;,
+## #   is_array &lt;lgl&gt;, formula_ref &lt;chr&gt;, formula_group &lt;int&gt;, comment &lt;chr&gt;,
+## #   height &lt;dbl&gt;, width &lt;dbl&gt;, style_format &lt;chr&gt;, local_format_id &lt;int&gt;
+```
+
+- This grabs a bunch of meta-data about the Excel entries, including color and formatting features
+- The data has been blown up on a cell-by-cell basis
+- Use `tidyverse` tools to fix this? Nope. `unpivotr` is more powerful in this case.
+
+---
+
+
+```r
+library(unpivotr)
+dataset1 %&gt;% 
+  filter(row != 1, row != 4, row &lt; 65) %&gt;% 
+  behead('N', tophead) %&gt;% 
+  behead('N', head2) %&gt;% 
+  behead('W', State) %&gt;% 
+  select(row, col, data_type, numeric, tophead, head2, State)
+```
+
+```
+## # A tibble: 960 x 7
+##      row   col data_type  numeric tophead               head2     State    
+##    &lt;int&gt; &lt;int&gt; &lt;chr&gt;        &lt;dbl&gt; &lt;chr&gt;                 &lt;chr&gt;     &lt;chr&gt;    
+##  1     5     2 numeric    9.31e+1 Total elementary, se… ADA as p… "   Unit…
+##  2     5     3 numeric    2.19e-1 &lt;NA&gt;                  &lt;NA&gt;      "   Unit…
+##  3     5     4 numeric    6.64e+0 &lt;NA&gt;                  Average … "   Unit…
+##  4     5     5 numeric    1.76e-2 &lt;NA&gt;                  &lt;NA&gt;      "   Unit…
+##  5     5     6 numeric    1.80e+2 &lt;NA&gt;                  Average … "   Unit…
+##  6     5     7 numeric    1.43e-1 &lt;NA&gt;                  &lt;NA&gt;      "   Unit…
+##  7     5     8 numeric    1.19e+3 &lt;NA&gt;                  Average … "   Unit…
+##  8     5     9 numeric    3.09e+0 &lt;NA&gt;                  &lt;NA&gt;      "   Unit…
+##  9     5    10 numeric    9.40e+1 Elementary schools    ADA as p… "   Unit…
+## 10     5    11 numeric    2.69e-1 &lt;NA&gt;                  &lt;NA&gt;      "   Unit…
+## # … with 950 more rows
+```
+
+- Pull off the two headers first with `behead`. Tell the function what direction (N, W, S, E or angles)
+the header is sitting in relation to the data
+- Pull off the first column with states, which is a "header" on the left
+- Show relevant columns
+
+---
+
+
+```r
+library(unpivotr)
+dataset1 %&gt;% 
+  filter(row != 1, row != 4, row &lt; 65) %&gt;% 
+  behead('N', tophead) %&gt;% 
+  behead('N', head2) %&gt;% 
+  behead('W', State) %&gt;% 
+  select(row, col, data_type, numeric, tophead, head2, State) %&gt;% 
+  mutate(header = ifelse(col %% 2 == 0, 'stats','se'))
+```
+
+```
+## # A tibble: 960 x 8
+##      row   col data_type  numeric tophead          head2    State    header
+##    &lt;int&gt; &lt;int&gt; &lt;chr&gt;        &lt;dbl&gt; &lt;chr&gt;            &lt;chr&gt;    &lt;chr&gt;    &lt;chr&gt; 
+##  1     5     2 numeric    9.31e+1 Total elementar… ADA as … "   Uni… stats 
+##  2     5     3 numeric    2.19e-1 &lt;NA&gt;             &lt;NA&gt;     "   Uni… se    
+##  3     5     4 numeric    6.64e+0 &lt;NA&gt;             Average… "   Uni… stats 
+##  4     5     5 numeric    1.76e-2 &lt;NA&gt;             &lt;NA&gt;     "   Uni… se    
+##  5     5     6 numeric    1.80e+2 &lt;NA&gt;             Average… "   Uni… stats 
+##  6     5     7 numeric    1.43e-1 &lt;NA&gt;             &lt;NA&gt;     "   Uni… se    
+##  7     5     8 numeric    1.19e+3 &lt;NA&gt;             Average… "   Uni… stats 
+##  8     5     9 numeric    3.09e+0 &lt;NA&gt;             &lt;NA&gt;     "   Uni… se    
+##  9     5    10 numeric    9.40e+1 Elementary scho… ADA as … "   Uni… stats 
+## 10     5    11 numeric    2.69e-1 &lt;NA&gt;             &lt;NA&gt;     "   Uni… se    
+## # … with 950 more rows
+```
+
+- even columns are stats, odd columns are standard errors
+- `%%` gives the remainder when left side is divided by right side
+
+---
+
+
+```r
+library(unpivotr)
+dataset1 %&gt;% 
+  filter(row != 1, row != 4, row &lt; 65) %&gt;% 
+  behead('N', tophead) %&gt;% 
+  behead('N', head2) %&gt;% 
+  behead('W', State) %&gt;% 
+  select(row, col, data_type, numeric, tophead, head2, State) %&gt;% 
+  mutate(header = ifelse(col %% 2 == 0, 'stats','se')) %&gt;% 
+  fill(tophead) %&gt;% fill(head2)
+```
+
+```
+## # A tibble: 960 x 8
+##      row   col data_type  numeric tophead          head2    State    header
+##    &lt;int&gt; &lt;int&gt; &lt;chr&gt;        &lt;dbl&gt; &lt;chr&gt;            &lt;chr&gt;    &lt;chr&gt;    &lt;chr&gt; 
+##  1     5     2 numeric    9.31e+1 Total elementar… ADA as … "   Uni… stats 
+##  2     5     3 numeric    2.19e-1 Total elementar… ADA as … "   Uni… se    
+##  3     5     4 numeric    6.64e+0 Total elementar… Average… "   Uni… stats 
+##  4     5     5 numeric    1.76e-2 Total elementar… Average… "   Uni… se    
+##  5     5     6 numeric    1.80e+2 Total elementar… Average… "   Uni… stats 
+##  6     5     7 numeric    1.43e-1 Total elementar… Average… "   Uni… se    
+##  7     5     8 numeric    1.19e+3 Total elementar… Average… "   Uni… stats 
+##  8     5     9 numeric    3.09e+0 Total elementar… Average… "   Uni… se    
+##  9     5    10 numeric    9.40e+1 Elementary scho… ADA as … "   Uni… stats 
+## 10     5    11 numeric    2.69e-1 Elementary scho… ADA as … "   Uni… se    
+## # … with 950 more rows
+```
+
+- column headers spanned several columns visually, but rested in left-most column internally
+- used _last value carried forward_ to fill in the other columns
+---
+
+
+```r
+library(unpivotr)
+tidy_dataset &lt;- dataset1 %&gt;% 
+  filter(row != 1, row != 4, row &lt; 65) %&gt;% 
+  behead('N', tophead) %&gt;% 
+  behead('N', head2) %&gt;% 
+  behead('W', State) %&gt;% 
+  select(row, col, data_type, numeric, tophead, head2, State) %&gt;% 
+  mutate(header = ifelse(col %% 2 == 0, 'stats','se')) %&gt;% 
+  fill(tophead) %&gt;% fill(head2) %&gt;% 
+  select(-col) %&gt;% 
+* spatter(header, numeric) %&gt;%
+  select(-row)
+tidy_dataset
+```
+
+```
+## # A tibble: 480 x 5
+##    tophead                        head2          State            se  stats
+##    &lt;chr&gt;                          &lt;chr&gt;          &lt;chr&gt;         &lt;dbl&gt;  &lt;dbl&gt;
+##  1 Elementary schools             ADA as percen… "   United … 0.269  9.40e1
+##  2 Elementary schools             Average hours… "   United … 0.0160 6.66e0
+##  3 Secondary schools              ADA as percen… "   United … 0.432  9.11e1
+##  4 Secondary schools              Average hours… "   United … 0.0403 6.59e0
+##  5 Total elementary, secondary, … ADA as percen… "   United … 0.219  9.31e1
+##  6 Total elementary, secondary, … Average days … "   United … 0.143  1.80e2
+##  7 Total elementary, secondary, … Average hours… "   United … 0.0176 6.64e0
+##  8 Total elementary, secondary, … Average hours… "   United … 3.09   1.19e3
+##  9 Elementary schools             ADA as percen… Alabama ...… 1.84   9.38e1
+## 10 Elementary schools             Average hours… Alabama ...… 0.0759 7.04e0
+## # … with 470 more rows
+```
+
+- `spatter` works like `spread`, but is more robust for this kind of weird data
+
+---
+
+
+```r
+tidy_dataset &lt;- tidy_dataset %&gt;% 
+* mutate(State = str_remove(State, '\\.+')) %&gt;%
+  mutate(State = str_trim(State))
+tidy_dataset
+```
+
+```
+## # A tibble: 480 x 5
+##    tophead                           head2           State        se  stats
+##    &lt;chr&gt;                             &lt;chr&gt;           &lt;chr&gt;     &lt;dbl&gt;  &lt;dbl&gt;
+##  1 Elementary schools                ADA as percent… United … 0.269  9.40e1
+##  2 Elementary schools                Average hours … United … 0.0160 6.66e0
+##  3 Secondary schools                 ADA as percent… United … 0.432  9.11e1
+##  4 Secondary schools                 Average hours … United … 0.0403 6.59e0
+##  5 Total elementary, secondary, and… ADA as percent… United … 0.219  9.31e1
+##  6 Total elementary, secondary, and… Average days i… United … 0.143  1.80e2
+##  7 Total elementary, secondary, and… Average hours … United … 0.0176 6.64e0
+##  8 Total elementary, secondary, and… Average hours … United … 3.09   1.19e3
+##  9 Elementary schools                ADA as percent… Alabama  1.84   9.38e1
+## 10 Elementary schools                Average hours … Alabama  0.0759 7.04e0
+## # … with 470 more rows
+```
+
+- We're using a __regular expression__ to identify and remove all the dots
+  - Rich tool for text searching
+- Next we trim away any white space that is around the string
+
+---
+
+# Save the data
+
+
+```r
+saveRDS(tidy_dataset, file = 'data/schools.rds')
+```
+
+The RDS format is an open standard and a fast way to store and retrieve datasets in R
+
+---
+class: middle, center
+
+# What about being colorful?
+
+---
+
+.pull-left[
+
+```r
+library(tidyxl)
+library(unpivotr)
+
+dataset2 &lt;- xlsx_cells('data/classlist.xlsx')
+formats &lt;- xlsx_formats('data/classlist.xlsx')
+```
+
+We need to grab the formats too, now
+
+
+```r
+format_id &lt;- dataset2$local_format_id
+dataset2$font_color &lt;- formats$local$font$color$rgb[format_id]
+dataset2$bg_color &lt;- formats$local$fill$patternFill$fgColor$rgb[format_id]
+
+unique(dataset2$font_color)
+```
+
+```
+## [1] "FF000000" "FF0563C1" "FFFF0000"
+```
+
+```r
+unique(dataset2$bg_color)
+```
+
+```
+## [1] "FFFFC000" NA         "FFE7E6E6"
+```
+
+
+]
+.pull-right[
+![](img/classlist.png)
+]
+
+---
+
+# Grab the red rows
+
+
+
+```r
+red_rows &lt;- dataset2 %&gt;% filter(font_color=='FFFF0000') %&gt;% 
+  select(row, col, data_type, character) %&gt;% 
+  mutate(row=2, col = 1:8)
+headers &lt;- dataset2 %&gt;% filter(bg_color == 'FFFFC000') %&gt;% 
+  select(row, col, data_type, character) %&gt;% 
+  mutate(row = 1, col = 1:8)
+
+bind_rows(headers, red_rows) %&gt;% 
+  behead('N', header) %&gt;% 
+  select(-col) %&gt;% 
+  spatter(header) %&gt;% 
+  select(-row)
+```
+
+```
+## # A tibble: 1 x 8
+##   `Current Org` `E mail` `Parent Agency` `Pending Org` Phone `Student Name`
+##   &lt;chr&gt;         &lt;chr&gt;    &lt;chr&gt;           &lt;chr&gt;         &lt;chr&gt; &lt;chr&gt;         
+## 1 INR/GGI/HIU   fellenz… State, Departm… INR/GGI/HIU   202-… Ms Christine …
+## # … with 2 more variables: `Training Dates` &lt;chr&gt;, `Training
+## #   Officer` &lt;chr&gt;
+```
+
+---
+
+# Tidying this data
+
+.pull-left[
+There are really two datasets interwoven here
+
+- The odd rows form one dataset
+- The even rows form another dataset
+
+We need to put these two datasets side-by-side
+]
+.pull-right[
+![](img/classlist.png)
+]
+
+---
+
+# Tidying this data
+
+.pull-left[
+
+```r
+dat1 &lt;- dataset2 %&gt;% 
+  filter( row %% 2 == 1) %&gt;% # odd rows
+  behead('N', header) %&gt;% 
+  mutate(row = (row+1)/2) # make the row numbers sequential
+
+dat2 &lt;- dataset2 %&gt;% 
+  filter(row %% 2 == 0) %&gt;%  # even rows
+  behead('N', header) %&gt;% 
+  mutate(row = row/2) %&gt;% # make row numbers sequential
+  mutate(col = col+4) # These will be the last 4 cols of new data
+
+tidy_dataset2 &lt;- 
+  rbind(dat1, dat2) %&gt;% # Put datsets on top of each other
+  select(row, data_type, numeric, character, header) %&gt;% 
+  spatter(header) %&gt;% 
+  select(-row, -numeric)
+```
+
+]
+.pull-right[
+![](img/classlist.png)
+]
+
+---
+
+# Tidying this data
+
+.pull-left[
+
+```r
+dat1 &lt;- dataset2 %&gt;% 
+  filter( row %% 2 == 1) %&gt;% # odd rows
+  behead('N', header) %&gt;% 
+  mutate(row = (row+1)/2) # make the row numbers sequential
+
+dat2 &lt;- dataset2 %&gt;% 
+  filter(row %% 2 == 0) %&gt;%  # even rows
+  behead('N', header) %&gt;% 
+  mutate(row = row/2) %&gt;% # make row numbers sequential
+  mutate(col = col+4) # These will be the last 4 cols of new data
+
+tidy_dataset2 &lt;- 
+  rbind(dat1, dat2) %&gt;% # Put datsets on top of each other
+  select(row, data_type, numeric, character, header) %&gt;% 
+  spatter(header) %&gt;% 
+  select(-row, -numeric)
+```
+
+]
+.pull-right[
+
+```
+## # A tibble: 12 x 8
+##    `Current Org` `E mail` `Parent Agency` `Pending Org` Phone
+##    &lt;chr&gt;         &lt;chr&gt;    &lt;chr&gt;           &lt;chr&gt;         &lt;chr&gt;
+##  1 EB/IFD/OMA    AbelEL@… State, Departm… EB/IFD/OMA    &lt;NA&gt; 
+##  2 FSI/SAIT/BA   BlyeR@s… State, Departm… FSI/SAIT/BA   &lt;NA&gt; 
+##  3 EB/IFD/OMA    fellenz… State, Departm… EB/IFD/OMA    202-…
+##  4 MED/CP/OHW/OH edwards… State, Departm… MED/CP/OHW/OH 202-…
+##  5 DS/MGT/LS     ellison… State, Departm… DS/MGT/LS     703-…
+##  6 INR/GGI/HIU   fellenz… State, Departm… INR/GGI/HIU   202-…
+##  7 INR/OPN/AA    Hammond… State, Departm… INR/OPN/AA    202-…
+##  8 CA/FPP/NFD    HornGD@… State, Departm… CA/FPP/NFD    202-…
+##  9 INR/GGI/HIU   mckenna… State, Departm… INR/GGI/HIU   202-…
+## 10 CA/VO/I       RizviSZ… State, Departm… CA/VO/I       202-…
+## 11 DS/MGT/PPD    whitean… State, Departm… DS/MGT/PPD    703-…
+## 12 HR/EX/SDD     YatesC@… State, Departm… HR/EX/SDD     202-…
+## # … with 3 more variables: `Student Name` &lt;chr&gt;, `Training Dates` &lt;chr&gt;,
+## #   `Training Officer` &lt;chr&gt;
+```
+]
+
+---
+
+# Tidying this data
+
+
+```r
+tidy_dataset2 &lt;- tidy_dataset2 %&gt;% 
+* set_names(make.names(names(.))) %&gt;%
+  select(Student.Name, everything())
+```
+
+
+```
+## # A tibble: 12 x 8
+##    Student.Name Current.Org E.mail Parent.Agency Pending.Org Phone
+##    &lt;chr&gt;        &lt;chr&gt;       &lt;chr&gt;  &lt;chr&gt;         &lt;chr&gt;       &lt;chr&gt;
+##  1 Mr Eric L. … EB/IFD/OMA  AbelE… State, Depar… EB/IFD/OMA  &lt;NA&gt; 
+##  2 Ms Rebecca … FSI/SAIT/BA BlyeR… State, Depar… FSI/SAIT/BA &lt;NA&gt; 
+##  3 Mr John T. … EB/IFD/OMA  felle… State, Depar… EB/IFD/OMA  202-…
+##  4 Ms Leslie D… MED/CP/OHW… edwar… State, Depar… MED/CP/OHW… 202-…
+##  5 Mr Joshua L… DS/MGT/LS   ellis… State, Depar… DS/MGT/LS   703-…
+##  6 Ms Christin… INR/GGI/HIU felle… State, Depar… INR/GGI/HIU 202-…
+##  7 Mr Christop… INR/OPN/AA  Hammo… State, Depar… INR/OPN/AA  202-…
+##  8 Miss Gina D… CA/FPP/NFD  HornG… State, Depar… CA/FPP/NFD  202-…
+##  9 Mr Andrew G… INR/GGI/HIU mcken… State, Depar… INR/GGI/HIU 202-…
+## 10 Ms Sana Z. … CA/VO/I     Rizvi… State, Depar… CA/VO/I     202-…
+## 11 Mrs Angela … DS/MGT/PPD  white… State, Depar… DS/MGT/PPD  703-…
+## 12 Ms Catina Z… HR/EX/SDD   Yates… State, Depar… HR/EX/SDD   202-…
+## # … with 2 more variables: Training.Dates &lt;chr&gt;, Training.Officer &lt;chr&gt;
+```
+
+---
+class: middle, center
+
+# Summarizing data
+
+---
+
+# The `dplyr` package
+
+This gives us 5 verbs for single data frames:
+
+- `filter`: filter a dataset by rows
+- `select`: select columns of a dataset
+- `arrange`: arrange rows of a dataset by values of some variables
+- `group_by`: split a dataset by values of some variables, so that we can apply verbs to each split
+- `summarize`: compute various summaries from the data
+
+---
+
+# The `dplyr` package
+
+.pull-left[
+Gives us verbs for joining 2 data frames:
+
+- `left_join`
+- `right_join`
+- `inner_join`
+- `outer_join`
+- `semi_join`
+- `anti_join`
+- `bind_rows`
+- `bind_cols`
+]
+.pull-right[
+The joins are different ways to merge two data sets which have at least one variable in common
+
+The `semi-join` and `anti-join` are really filters rather than joins
+
+The last two just put data frames together as long as they conform in dimension
+]
+
+---
+
+
+```r
+library(tidyverse)
+mtcars1 &lt;- mtcars %&gt;% rownames_to_column('cars') %&gt;% as_tibble()
+mtcars1
+```
+
+```
+## # A tibble: 32 x 12
+##    cars     mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb
+##    &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+##  1 Mazda…  21       6  160    110  3.9   2.62  16.5     0     1     4     4
+##  2 Mazda…  21       6  160    110  3.9   2.88  17.0     0     1     4     4
+##  3 Datsu…  22.8     4  108     93  3.85  2.32  18.6     1     1     4     1
+##  4 Horne…  21.4     6  258    110  3.08  3.22  19.4     1     0     3     1
+##  5 Horne…  18.7     8  360    175  3.15  3.44  17.0     0     0     3     2
+##  6 Valia…  18.1     6  225    105  2.76  3.46  20.2     1     0     3     1
+##  7 Duste…  14.3     8  360    245  3.21  3.57  15.8     0     0     3     4
+##  8 Merc …  24.4     4  147.    62  3.69  3.19  20       1     0     4     2
+##  9 Merc …  22.8     4  141.    95  3.92  3.15  22.9     1     0     4     2
+## 10 Merc …  19.2     6  168.   123  3.92  3.44  18.3     1     0     4     4
+## # … with 22 more rows
+```
+--
+
+
+```r
+mtcars1 %&gt;% summarize(mpg = mean(mpg, na.rm=T), disp = mean(disp, na.rm=T), hp = mean(hp, na.rm=T))
+```
+
+```
+## # A tibble: 1 x 3
+##     mpg  disp    hp
+##   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+## 1  20.1  231.  147.
+```
+
+---
+
+# Scoped verbs
+
+All the `dplyr` verbs have scoped versions `*_all`, `*_at` and `*_if`.
+
+1. `*_all` : Act on all columns
+1.  `*_at`  : Act on specified columns
+1.  `*_if`  : Act on columns with specific property
+
+--
+
+```r
+mtcars1 %&gt;% summarize_at(vars(mpg, disp, hp), mean, na.rm=T)
+```
+
+```
+## # A tibble: 1 x 3
+##     mpg  disp    hp
+##   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+## 1  20.1  231.  147.
+```
+
+---
+
+# Factors (categorical variables)
+
+`factor` types of variables are discrete or categorical variables, that only take
+a small set of values. Think number of cylinders in a car, race, sex. 
+
+
+```r
+mtcars1 &lt;- mtcars1 %&gt;% 
+  mutate_at(vars(cyl, vs, am, gear, carb), as.factor)
+str(mtcars1)
+```
+
+```
+## Classes 'tbl_df', 'tbl' and 'data.frame':	32 obs. of  12 variables:
+##  $ cars: chr  "Mazda RX4" "Mazda RX4 Wag" "Datsun 710" "Hornet 4 Drive" ...
+##  $ mpg : num  21 21 22.8 21.4 18.7 18.1 14.3 24.4 22.8 19.2 ...
+##  $ cyl : Factor w/ 3 levels "4","6","8": 2 2 1 2 3 2 3 1 1 2 ...
+##  $ disp: num  160 160 108 258 360 ...
+##  $ hp  : num  110 110 93 110 175 105 245 62 95 123 ...
+##  $ drat: num  3.9 3.9 3.85 3.08 3.15 2.76 3.21 3.69 3.92 3.92 ...
+##  $ wt  : num  2.62 2.88 2.32 3.21 3.44 ...
+##  $ qsec: num  16.5 17 18.6 19.4 17 ...
+##  $ vs  : Factor w/ 2 levels "0","1": 1 1 2 2 1 2 1 2 2 2 ...
+##  $ am  : Factor w/ 2 levels "0","1": 2 2 2 1 1 1 1 1 1 1 ...
+##  $ gear: Factor w/ 3 levels "3","4","5": 2 2 2 1 1 1 1 2 2 2 ...
+##  $ carb: Factor w/ 6 levels "1","2","3","4",..: 4 4 1 1 2 1 4 2 2 4 ...
+```
+
+---
+
+# Means of numeric variables
+
+
+```r
+mtcars1 %&gt;% summarize_if(is.numeric, mean)
+```
+
+```
+## # A tibble: 1 x 6
+##     mpg  disp    hp  drat    wt  qsec
+##   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+## 1  20.1  231.  147.  3.60  3.22  17.8
+```
+
+
+---
+
+# Summarize the variables
+
+
+```r
+summary(mtcars1)
+```
+
+```
+##      cars                mpg        cyl         disp             hp       
+##  Length:32          Min.   :10.40   4:11   Min.   : 71.1   Min.   : 52.0  
+##  Class :character   1st Qu.:15.43   6: 7   1st Qu.:120.8   1st Qu.: 96.5  
+##  Mode  :character   Median :19.20   8:14   Median :196.3   Median :123.0  
+##                     Mean   :20.09          Mean   :230.7   Mean   :146.7  
+##                     3rd Qu.:22.80          3rd Qu.:326.0   3rd Qu.:180.0  
+##                     Max.   :33.90          Max.   :472.0   Max.   :335.0  
+##       drat             wt             qsec       vs     am     gear  
+##  Min.   :2.760   Min.   :1.513   Min.   :14.50   0:18   0:19   3:15  
+##  1st Qu.:3.080   1st Qu.:2.581   1st Qu.:16.89   1:14   1:13   4:12  
+##  Median :3.695   Median :3.325   Median :17.71                 5: 5  
+##  Mean   :3.597   Mean   :3.217   Mean   :17.85                       
+##  3rd Qu.:3.920   3rd Qu.:3.610   3rd Qu.:18.90                       
+##  Max.   :4.930   Max.   :5.424   Max.   :22.90                       
+##  carb  
+##  1: 7  
+##  2:10  
+##  3: 3  
+##  4:10  
+##  6: 1  
+##  8: 1
+```
+
+---
+class: middle, center
+
+
+# Split-Apply-Combine
+
+---
+
+![](img/split-apply-combine.png)
+
+---
+
+# Grouped summaries
+
+
+```r
+mtcars1 %&gt;% 
+  group_by(cyl) %&gt;% 
+  summarize(mpg_mean = mean(mpg))
+```
+
+```
+## # A tibble: 3 x 2
+##   cyl   mpg_mean
+##   &lt;fct&gt;    &lt;dbl&gt;
+## 1 4         26.7
+## 2 6         19.7
+## 3 8         15.1
+```
+
+---
+
+# Grouped summaries
+
+```r
+mtcars1 %&gt;% 
+  group_by(cyl) %&gt;% 
+  summarize_if(is.numeric, mean)
+```
+
+```
+## # A tibble: 3 x 7
+##   cyl     mpg  disp    hp  drat    wt  qsec
+##   &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+## 1 4      26.7  105.  82.6  4.07  2.29  19.1
+## 2 6      19.7  183. 122.   3.59  3.12  18.0
+## 3 8      15.1  353. 209.   3.23  4.00  16.8
+```
+
+---
+
+# Grouped summaries
+
+
+```r
+mtcars1 %&gt;% 
+  group_by(cyl) %&gt;% 
+  summarize_if(is.numeric, list('mean' = mean, 'median' = median))
+```
+
+```
+## # A tibble: 3 x 13
+##   cyl   mpg_mean disp_mean hp_mean drat_mean wt_mean qsec_mean mpg_median
+##   &lt;fct&gt;    &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;
+## 1 4         26.7      105.    82.6      4.07    2.29      19.1       26  
+## 2 6         19.7      183.   122.       3.59    3.12      18.0       19.7
+## 3 8         15.1      353.   209.       3.23    4.00      16.8       15.2
+## # … with 5 more variables: disp_median &lt;dbl&gt;, hp_median &lt;dbl&gt;,
+## #   drat_median &lt;dbl&gt;, wt_median &lt;dbl&gt;, qsec_median &lt;dbl&gt;
+```
+
+---
+
+# Violence in West Africa
+
+
+```r
+west_africa &lt;- import('data/2000-01-01-2019-01-01-Western_Africa.csv')
+west_africa %&gt;% group_by(country, year) %&gt;% tally()
+```
+
+```
+## # A tibble: 290 x 3
+## # Groups:   country [15]
+##    country  year     n
+##    &lt;chr&gt;   &lt;int&gt; &lt;int&gt;
+##  1 Benin    2000     1
+##  2 Benin    2001     3
+##  3 Benin    2002     1
+##  4 Benin    2003     2
+##  5 Benin    2004     2
+##  6 Benin    2005     2
+##  7 Benin    2006     1
+##  8 Benin    2007     3
+##  9 Benin    2008     1
+## 10 Benin    2009     2
+## # … with 280 more rows
+```
+
+---
+class: middle, center
+
+# Joins
+
+---
+
+![](img/joins.png)
+
+
+---
+
+# Some simulated data
+
+We simulated 2 datasets
+- real estate allocation at DOS by Bureau
+- staffing at DOS by Bureau
+
+We want to see what the average area per person is across DOS
+
+
+```r
+staffing_data &lt;- import('data/Staffing_by_Bureau.csv')
+real_estate &lt;- import('data/DoS_Real_Estate_Allocation.csv')
+```
+
+---
+
+
+```r
+staffing_data %&gt;% as_tibble()
+```
+
+```
+## # A tibble: 10,000 x 6
+##    Bureau                      Gender Grade Title    Name      YearsService
+##    &lt;chr&gt;                       &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;    &lt;chr&gt;            &lt;int&gt;
+##  1 Protocol (S/CPR)            female FS1   Manager  Cathy Ca…           13
+##  2 Administration (A)          male   GS-9  Team Me… Jeffery …           13
+##  3 Intelligence and Research … male   FS-6  Analyst  Max Green           11
+##  4 Mission to the United Nati… male   FS-3  Manager  Donald A…            7
+##  5 Foreign Missions (OFM)      male   FS-6  Team Me… Thomas L…           22
+##  6 International Narcotics an… male   GS-8  Team Me… Joseph A…           12
+##  7 Administration (A)          male   GS-12 Analyst  Michael …            6
+##  8 Intelligence and Research … male   FS-5  Team Me… Jesus Sh…            2
+##  9 Science &amp; Technology Advis… male   N/A   Manager  Lawrence…           19
+## 10 Administration (A)          female FS-8  Team Me… Jennie C…           17
+## # … with 9,990 more rows
+```
+
+```r
+real_estate %&gt;% as_tibble()
+```
+
+```
+## # A tibble: 666 x 4
+##    Building Bureau               Location  Size
+##    &lt;chr&gt;    &lt;chr&gt;                   &lt;int&gt; &lt;int&gt;
+##  1 HST      Administration (A)       4779   640
+##  2 SA2      Administration (A)       4801  1090
+##  3 HST      Administration (A)       5109  1040
+##  4 HST      Administration (A)       3717  1620
+##  5 SA4      Administration (A)       3940  1390
+##  6 HST      Administration (A)       3661  1480
+##  7 HST      Administration (A)       3374  1770
+##  8 HST      Administration (A)       3387  1940
+##  9 SA10     African Affairs (AF)     2605   640
+## 10 HST      African Affairs (AF)     3573   720
+## # … with 656 more rows
+```
+
+---
+
+
+```r
+staff_summary &lt;- staffing_data %&gt;% 
+  group_by(Bureau) %&gt;% 
+  tally(name = 'Pop')
+realestate_summary &lt;- real_estate %&gt;% 
+ group_by(Bureau) %&gt;% summarize(Size = sum(Size))
+```
+
+```r
+staff_summary %&gt;% head(4)
+```
+
+```
+## # A tibble: 4 x 2
+##   Bureau                                            Pop
+##   &lt;chr&gt;                                           &lt;int&gt;
+## 1 Administration (A)                                454
+## 2 African Affairs (AF)                               42
+## 3 Allowances (A/OPR/ALS)                             90
+## 4 Arms Control, Verification and Compliance (AVC)    98
+```
+
+```r
+realestate_summary %&gt;% head(4)
+```
+
+```
+## # A tibble: 4 x 2
+##   Bureau                                           Size
+##   &lt;chr&gt;                                           &lt;int&gt;
+## 1 Administration (A)                              10970
+## 2 African Affairs (AF)                            26750
+## 3 Allowances (A/OPR/ALS)                           3010
+## 4 Arms Control, Verification and Compliance (AVC)  8410
+```
+
+---
+
+
+```r
+staff_summary %&gt;% 
+  inner_join(realestate_summary, by = c("Bureau" = "Bureau"))
+```
+
+```
+## # A tibble: 54 x 3
+##    Bureau                                             Pop  Size
+##    &lt;chr&gt;                                            &lt;int&gt; &lt;int&gt;
+##  1 Administration (A)                                 454 10970
+##  2 African Affairs (AF)                                42 26750
+##  3 Allowances (A/OPR/ALS)                              90  3010
+##  4 Arms Control, Verification and Compliance (AVC)     98  8410
+##  5 Budget and Planning (BP)                           168  7500
+##  6 Chief Information Officer (CIO)                    222 11390
+##  7 Comptroller and Global Financial Services (CGFS)   169 15700
+##  8 Conflict and Stabilization Operations (CSO)        392 14970
+##  9 Consular Affairs (CA)                              141 36610
+## 10 Counterterrorism (CT)                              324  9980
+## # … with 44 more rows
+```
+
+---
+
+
+```r
+staff_summary %&gt;% 
+  inner_join(realestate_summary, by = c("Bureau" = "Bureau")) %&gt;% 
+  mutate(unit_area = Size/Pop) %&gt;% 
+  arrange(unit_area)
+```
+
+```
+## # A tibble: 54 x 4
+##    Bureau                                               Pop  Size unit_area
+##    &lt;chr&gt;                                              &lt;int&gt; &lt;int&gt;     &lt;dbl&gt;
+##  1 Global Youth Issues (GYI)                            345  2090      6.06
+##  2 Policy Planning Staff (S/P)                          240  2420     10.1 
+##  3 Science &amp; Technology Adviser (STAS)                  305  4240     13.9 
+##  4 Foreign Missions (OFM)                               311  4420     14.2 
+##  5 Trafficking in Persons (TIP)                         247  5150     20.9 
+##  6 Medical Services (MED)                               308  6760     21.9 
+##  7 Protocol (S/CPR)                                     327  7730     23.6 
+##  8 Administration (A)                                   454 10970     24.2 
+##  9 Oceans and International Environmental and Scient…   330  8420     25.5 
+## 10 Energy Resources (ENR)                               369 10890     29.5 
+## # … with 44 more rows
+```
     </textarea>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
 <script>var slideshow = remark.create({
