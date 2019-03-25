@@ -17,8 +17,19 @@ navbar:
     - icon: fa-github
       text: GitHub
       href: https://github.com/araastat/FSI_Workshop
-output:
-  html_document:
-    theme: cosmo
-    highlight: textmate
-    css: styles.css
+# output:
+#   html_document:
+#     theme: cosmo
+#     highlight: textmate
+#     css: styles.css
+#   xaringan::moon_reader:
+#     css: [default, './robot.css', './robot-fonts.css']
+#     #css: [default, metropolis, metropolis-fonts]
+#     nature:
+#       ratio: '16:9'
+#       highlightLanguage: R
+#       countIncrementalSlides: false
+#       highlightStyle: zenburn
+#       highlightLines: true
+#       slideNumberFormat: "%current%"
+#

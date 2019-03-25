@@ -4,7 +4,7 @@ pkgs_for_install <- c('rsample','sf','here','odbc','RODBC',
                       'ggfortify','ggExtra','DT','officer','infer','forecast',
                       'neuralnet')
 install.packages(pkgs_for_install,
-                 contriburl = "file:///Users/aikid/ARAASTAT/FSI/FSI_Workshop/pkgs_for_download")
+                 contriburl = "file:///Downloads/PS312/Rmodules")
 # For me, the package zip files are stored in
 # C:\Users\aikid\ARAASTAT\FSI\FSI_Workshop\pkgs_for_download
 # In the contriburl entry above, the "C:\" is replaced by "file:///", and all the backslashes become "/"

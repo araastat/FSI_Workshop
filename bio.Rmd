@@ -1,6 +1,10 @@
 ---
 title: Instructor bios
-output: html_document
+output:
+  html_document:
+    theme: cosmo
+    highlight: textmate
+    css: styles.css
 ---
 
 #### Abhijit Dasgupta, PhD

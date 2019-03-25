@@ -1,0 +1,191 @@
+---
+title: Data munging
+author: "Abhijit Dasgupta"
+date: "March 25-27, 2019"
+output: 
+  xaringan::moon_reader:
+    css: [default, './robot.css', './robot-fonts.css']
+    #css: [default, metropolis, metropolis-fonts]
+    nature:
+      ratio: '16:9'
+      highlightLanguage: R
+      countIncrementalSlides: false
+      highlightStyle: zenburn
+      highlightLines: true
+      slideNumberFormat: "%current%"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+layout: true
+
+<div class="my-header">
+<span>PS 312, March 2019</span></div>
+
+---
+class: middle, center
+
+# Tidy data
+
+---
+
+# Make the computer happy
+
+Just as we want code to make humans happy, we want data to make computers happy
+
+Tidy data is a principle promoted by Dr. Hadley Wickham to make computers happy
+
+--
+
+The properties of a tidy dataset are:
+
+1. Each variable forms a column
+1. Each observation forms a row
+1. Each type of observational unit forms a table. 
+
+This forms a standardized way to structure a dataset, and so makes it easy for the 
+analyst to develop standard pipelines. 
+
+---
+class: center, middle
+
+## A tidy dataset is tidy in one way, but a messy dataset can be messy in many ways
+
+<span style='text-align:right;font-size:30pt;'>Hadley Wickham</span>
+
+---
+
+# Messy data
+
+A dataset can be messy in many many ways. Many of the more common issues are listed below:
+
+- Column names contain values, not just variable names
+- Multiple variables are stored in one column
+- Variables are stored in both rows and columns
+- Multiple types of observational types are stored in the same table
+- A single observational unit is stored in multiple tables
+
+Sometimes the messier format is better for data entry, but bad for data analyses. 
+
+
+---
+
+# Variables in column names
+
+```{r}
+library(tidyverse)
+pew <- import('data/pew.csv')
+head(pew, 4)
+```
+
+- This dataset has actual data in the column headers, rather than variable names. 
+- We should ideally have 3 columns in this dataset: religion, income and frequency. 
+- We can achieve this using a function called `gather` which takes a wide dataset and makes it tall. 
+
+---
+
+.left-column[
+- Gather all the columns into two columns, `income` and `frequency`, by stacking the columns
+- Don't include the variable `religion`
+]
+.right-column[
+```{r, eval=T}
+pew %>% 
+  gather(income, frequency, -religion)
+```
+]
+
+---
+
+.pull-left[
+```{r}
+head(pew)
+```
+]
+.pull-right[
+```{r}
+pew %>% 
+  gather(income, frequency, -religion) %>% head(20)
+```
+
+]
+
+---
+
+# Multiple variables in column names
+
+```{r}
+tb <- import('data/tb.csv') %>% as_tibble()
+head(tb)
+```
+
+- column headers include both sex and age
+
+---
+
+```{r}
+tb %>% 
+  gather(sex_age, n, -iso2, -year, -fu)
+
+
+```
+
+---
+
+```{r}
+tb %>% 
+  gather(sex_age, n, -iso2, -year, -fu, na.rm=T)
+
+
+```
+
+---
+
+```{r}
+tb %>% 
+  gather(sex_age, n, -iso2, -year, -fu, na.rm=T) %>% 
+  separate(sex_age, c('sex','age'), sep=1) # by position
+
+```
+
+This still needs to be cleaned
+
+---
+
+# Variables stored in rows and columns
+
+```{r}
+weather <- import('data/weather.csv') %>% as_tibble()
+weather
+```
+
+---
+
+```{r}
+weather %>% 
+  gather(day, temp, d1:d31) #<<
+```
+
+`d1:d31` denotes all the variables physically between `d1` and `d31` in the dataset
+
+> See what happens when you type `1:10` in the console
+
+---
+
+```{r}
+weather %>% 
+  gather(date, temp, d1:d31) %>% 
+  spread(element, temp) #<<
+```
+
+---
+class: middle, center
+
+# Data cleaning
+
+---
+
+
+

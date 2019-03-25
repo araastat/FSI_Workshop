@@ -2,7 +2,12 @@
 title: "PS 312: Programming with R"
 author: "Abhijit Dasgupta"
 date: "March 25-27, 2019"
-output: html_document
+output:
+  html_document:
+    theme: cosmo
+    highlight: textmate
+    css: styles.css
+
 ---
 
 ```{r, include = FALSE, eval = knitr::opts_knit$get("rmarkdown.pandoc.to") == "html"}
