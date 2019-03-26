@@ -62,7 +62,7 @@ create another object (noun) that is useful to you in some way.
 - You add on to this with other modules called _packages_ to enhance functionality
 - After you've installed a package, you have to activate it when you need it with a function called `library`
 
-```{r, echo = F}
+```{r, eval=F, echo = F}
 pkgs <- paste0('package:',tidyverse::tidyverse_packages())
 for(p in pkgs){
   if (p %in% search()){
@@ -454,14 +454,14 @@ just import data, it is not saved since it doesn't yet have a name.
 
 ```{r, eval = F}
 library(rio) # activate the package
-import('data/HR_Data.csv') # can use single or double quotes
+import('Data/FSI/HR_Data.csv') # can use single or double quotes
 ```
 
 So every time you import data, you have to name it. You do this using the `<-` operator. 
 
 ```{r, echo = T}
 library(rio)
-hr_data <- import('data/HR_Data.csv')
+hr_data <- import('Data/FSI/HR_Data.csv')
 ```
 
 ---
@@ -487,13 +487,13 @@ View(hr_data)
 # Finer control of CSV imports
 
 ```{r}
-hr_data <- import('data/HR_Data.csv', check.names = TRUE)
+hr_data <- import('Data/FSI/HR_Data.csv', check.names = TRUE)
 ```
 
 This ensures that the names of the variables are proper
 
 ```{r, eval = F}
-hr_data <- import('data/HR_Data.csv', check.names = TRUE, dec = ',')
+hr_data <- import('Data/FSI/HR_Data.csv', check.names = TRUE, dec = ',')
 ```
 This allows European data to be correctly entered. 
 
@@ -505,13 +505,13 @@ You can specify sheet names or sheet positions for import from an Excel file. If
 know the sheet name, you can specify it using the `which` option:
 
 ```{r}
-dos_data <- import('data/simulatedDOS.xlsx', which='Staffing_by_Bureau')
+dos_data <- import('Data/FSI/simulatedDOS.xlsx', which='Staffing_by_Bureau')
 ```
 
 You can also grab the same sheet by position:
 
 ```{r, eval = F}
-dos_data <- import('data/simulatedDOS.xlsx', which = 2)
+dos_data <- import('Data/FSI/simulatedDOS.xlsx', which = 2)
 ```
 
 > See the help file for `import` by typing `?import` in the console or searching in the Help pane

@@ -40,7 +40,7 @@ a:hover, a:hover > code {
   padding-right: 4em;
   font-size: 90%;
 }
-.remark-code-line-highlighted { background-color: green; } /* modified */
+.remark-code-line-highlighted { background-color: yellow; } /* modified */
 
 .inverse {
   background-color: #4c4c4c;
@@ -128,7 +128,7 @@ div.my-header {
 }
 
 div.my-header span{
-  font-size: 12pt;
+  font-size: 14pt;
   color: #F7F8FA;
   position: absolute;
   left: 15px;
@@ -140,4 +140,23 @@ div.my-header span{
   padding-left: 1em;
   font-size: 200%;
   font-style: italic;
+}
+
+.column:first-of-type {float:left;}
+.column:last-of-type {float:right;}
+
+.split-40 .column:first-of-type {width: 40%;}
+.split-40 .column:last-of-type {width: 57%;}
+.split-30 .column:first-of-type {width: 30%;}
+.split-30 .column:last-of-type {width: 67%;}
+
+.left-column30 {
+  color: #777;
+  width: 30%;
+  height: 92%;
+  float: left;
+}
+.right-column30 {
+  width: 67%;
+  float: right;
 }

@@ -21,3 +21,10 @@ Last updated: `r format(Sys.time(), '%b %d, %Y (%l:%M%p %Z)')`
 # Getting in the weeds
 
 - [Data munging](Day1_DataMunging.html)
+- [Data summaries](Day2_Summaries.html)
+
+# Visualization
+
+- [Gallery](Gallery.html)
+- [Data visualization](Day2_DataViz.html)
+- [Publication quality graphics](lecture_pubgraphics.html)

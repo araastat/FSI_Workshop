@@ -73,23 +73,6 @@ create another object (noun) that is useful to you in some way.
 library(tidyverse)
 ```
 
-```
-## ── Attaching packages ───────────────────────────────────────────────── tidyverse 1.2.1 ──
-```
-
-```
-## ✔ ggplot2 3.1.0          ✔ purrr   0.3.2     
-## ✔ tibble  2.0.1          ✔ dplyr   0.8.0.9009
-## ✔ tidyr   0.8.3          ✔ stringr 1.4.0     
-## ✔ readr   1.3.1          ✔ forcats 0.4.0
-```
-
-```
-## ── Conflicts ──────────────────────────────────────────────────── tidyverse_conflicts() ──
-## ✖ dplyr::filter() masks stats::filter()
-## ✖ dplyr::lag()    masks stats::lag()
-```
-
 ---
 
 # R is case-sensitive
@@ -573,7 +556,7 @@ just import data, it is not saved since it doesn't yet have a name.
 
 ```r
 library(rio) # activate the package
-import('data/HR_Data.csv') # can use single or double quotes
+import('Data/FSI/HR_Data.csv') # can use single or double quotes
 ```
 
 So every time you import data, you have to name it. You do this using the `&lt;-` operator. 
@@ -581,7 +564,7 @@ So every time you import data, you have to name it. You do this using the `&lt;-
 
 ```r
 library(rio)
-hr_data &lt;- import('data/HR_Data.csv')
+hr_data &lt;- import('Data/FSI/HR_Data.csv')
 ```
 
 ---
@@ -641,14 +624,14 @@ View(hr_data)
 
 
 ```r
-hr_data &lt;- import('data/HR_Data.csv', check.names = TRUE)
+hr_data &lt;- import('Data/FSI/HR_Data.csv', check.names = TRUE)
 ```
 
 This ensures that the names of the variables are proper
 
 
 ```r
-hr_data &lt;- import('data/HR_Data.csv', check.names = TRUE, dec = ',')
+hr_data &lt;- import('Data/FSI/HR_Data.csv', check.names = TRUE, dec = ',')
 ```
 This allows European data to be correctly entered. 
 
@@ -661,14 +644,14 @@ know the sheet name, you can specify it using the `which` option:
 
 
 ```r
-dos_data &lt;- import('data/simulatedDOS.xlsx', which='Staffing_by_Bureau')
+dos_data &lt;- import('Data/FSI/simulatedDOS.xlsx', which='Staffing_by_Bureau')
 ```
 
 You can also grab the same sheet by position:
 
 
 ```r
-dos_data &lt;- import('data/simulatedDOS.xlsx', which = 2)
+dos_data &lt;- import('Data/FSI/simulatedDOS.xlsx', which = 2)
 ```
 
 &gt; See the help file for `import` by typing `?import` in the console or searching in the Help pane

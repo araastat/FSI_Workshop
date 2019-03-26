@@ -10,13 +10,13 @@ output:
       ratio: '16:9'
       highlightLanguage: R
       countIncrementalSlides: false
-      highlightStyle: zenburn
+      highlightStyle: docco
       highlightLines: true
       slideNumberFormat: "%current%"
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, comment = '')
 library(rio)
 ```
 
@@ -75,9 +75,9 @@ Sometimes the messier format is better for data entry, but bad for data analyses
 
 # Variables in column names
 
-```{r}
+```{r, message = F, warning = F}
 library(tidyverse)
-pew <- import('data/pew.csv')
+pew <- import('Data/FSI/pew.csv')
 head(pew, 4)
 ```
 
@@ -94,7 +94,8 @@ head(pew, 4)
 .right-column[
 ```{r, eval=T}
 pew %>% 
-  gather(income, frequency, -religion)
+  gather(income, frequency, -religion) %>%
+  as_tibble()
 ```
 ]
 
@@ -118,7 +119,7 @@ pew %>%
 # Multiple variables in column names
 
 ```{r}
-tb <- import('data/tb.csv') %>% as_tibble()
+tb <- import('Data/FSI/tb.csv') %>% as_tibble()
 head(tb)
 ```
 
@@ -158,7 +159,7 @@ This still needs to be cleaned
 # Variables stored in rows and columns
 
 ```{r}
-weather <- import('data/weather.csv') %>% as_tibble()
+weather <- import('Data/FSI/weather.csv') %>% as_tibble()
 weather
 ```
 
@@ -241,7 +242,7 @@ weather2 <- weather %>%
 
 # Exercise
 
-The file `data/mbta.xlsx` contains monthly data on number of commuter trips by different modalities on the MBTA system n Boston. 
+The file `Data/FSI/mbta.xlsx` contains monthly data on number of commuter trips by different modalities on the MBTA system n Boston. 
 
 - It is in a messy format. 
 - It also has an additional quirk in that it has a title on the first line that 
@@ -254,7 +255,7 @@ position as well as name, so `gather(date, avg_trips, -1, -mode)` is valid to no
 ---
 
 ```{r, echo = T, message=F}
-mbta <- import('data/mbta.xlsx', skip = 1) %>% as_tibble()
+mbta <- import('Data/FSI/mbta.xlsx', skip = 1) %>% as_tibble()
 mbta2 <- mbta %>% 
   gather(date, avg_trips, -1, -mode) %>% 
   separate(date, c("year", "month"), sep = '-')
@@ -366,7 +367,7 @@ class: middle, center
 
 ```{r, warning=F}
 library(tidyxl)
-dataset1 <- xlsx_cells('data/attendance.xlsx')
+dataset1 <- xlsx_cells('Data/FSI/attendance.xlsx')
 dataset1
 ```
 
@@ -461,7 +462,7 @@ tidy_dataset
 # Save the data
 
 ```{r}
-saveRDS(tidy_dataset, file = 'data/schools.rds')
+saveRDS(tidy_dataset, file = 'Data/FSI/schools.rds')
 ```
 
 The RDS format is an open standard and a fast way to store and retrieve datasets in R
@@ -478,8 +479,8 @@ class: middle, center
 library(tidyxl)
 library(unpivotr)
 
-dataset2 <- xlsx_cells('data/classlist.xlsx')
-formats <- xlsx_formats('data/classlist.xlsx')
+dataset2 <- xlsx_cells('Data/FSI/classlist.xlsx')
+formats <- xlsx_formats('Data/FSI/classlist.xlsx')
 ```
 
 We need to grab the formats too, now
@@ -610,215 +611,5 @@ tidy_dataset2 <- tidy_dataset2 %>%
 
 ```{r, echo=F}
 tidy_dataset2
-```
-
----
-class: middle, center
-
-# Summarizing data
-
----
-
-# The `dplyr` package
-
-This gives us 5 verbs for single data frames:
-
-- `filter`: filter a dataset by rows
-- `select`: select columns of a dataset
-- `arrange`: arrange rows of a dataset by values of some variables
-- `group_by`: split a dataset by values of some variables, so that we can apply verbs to each split
-- `summarize`: compute various summaries from the data
-
----
-
-# The `dplyr` package
-
-.pull-left[
-Gives us verbs for joining 2 data frames:
-
-- `left_join`
-- `right_join`
-- `inner_join`
-- `outer_join`
-- `semi_join`
-- `anti_join`
-- `bind_rows`
-- `bind_cols`
-]
-.pull-right[
-The joins are different ways to merge two data sets which have at least one variable in common
-
-The `semi-join` and `anti-join` are really filters rather than joins
-
-The last two just put data frames together as long as they conform in dimension
-]
-
----
-
-```{r}
-library(tidyverse)
-mtcars1 <- mtcars %>% rownames_to_column('cars') %>% as_tibble()
-mtcars1
-```
---
-
-```{r}
-mtcars1 %>% summarize(mpg = mean(mpg, na.rm=T), disp = mean(disp, na.rm=T), hp = mean(hp, na.rm=T))
-```
-
----
-
-# Scoped verbs
-
-All the `dplyr` verbs have scoped versions `*_all`, `*_at` and `*_if`.
-
-1. `*_all` : Act on all columns
-1.  `*_at`  : Act on specified columns
-1.  `*_if`  : Act on columns with specific property
-
---
-```{r}
-mtcars1 %>% summarize_at(vars(mpg, disp, hp), mean, na.rm=T)
-```
-
----
-
-# Factors (categorical variables)
-
-`factor` types of variables are discrete or categorical variables, that only take
-a small set of values. Think number of cylinders in a car, race, sex. 
-
-```{r}
-mtcars1 <- mtcars1 %>% 
-  mutate_at(vars(cyl, vs, am, gear, carb), as.factor)
-str(mtcars1)
-```
-
----
-
-# Means of numeric variables
-
-```{r}
-mtcars1 %>% summarize_if(is.numeric, mean)
-```
-
-
----
-
-# Summarize the variables
-
-```{r}
-summary(mtcars1)
-```
-
----
-class: middle, center
-
-
-# Split-Apply-Combine
-
----
-
-![](img/split-apply-combine.png)
-
----
-
-# Grouped summaries
-
-```{r}
-mtcars1 %>% 
-  group_by(cyl) %>% 
-  summarize(mpg_mean = mean(mpg))
-```
-
----
-
-# Grouped summaries
-```{r}
-mtcars1 %>% 
-  group_by(cyl) %>% 
-  summarize_if(is.numeric, mean)
-```
-
----
-
-# Grouped summaries
-
-```{r}
-mtcars1 %>% 
-  group_by(cyl) %>% 
-  summarize_if(is.numeric, list('mean' = mean, 'median' = median))
-```
-
----
-
-# Violence in West Africa
-
-```{r}
-west_africa <- import('data/2000-01-01-2019-01-01-Western_Africa.csv')
-west_africa %>% group_by(country, year) %>% tally()
-```
-
----
-class: middle, center
-
-# Joins
-
----
-
-![](img/joins.png)
-
-
----
-
-# Some simulated data
-
-We simulated 2 datasets
-- real estate allocation at DOS by Bureau
-- staffing at DOS by Bureau
-
-We want to see what the average area per person is across DOS
-
-```{r}
-staffing_data <- import('data/Staffing_by_Bureau.csv')
-real_estate <- import('data/DoS_Real_Estate_Allocation.csv')
-```
-
----
-
-```{r}
-staffing_data %>% as_tibble()
-real_estate %>% as_tibble()
-```
-
----
-
-```{r, message=T}
-staff_summary <- staffing_data %>% 
-  group_by(Bureau) %>% 
-  tally(name = 'Pop')
-realestate_summary <- real_estate %>% 
- group_by(Bureau) %>% summarize(Size = sum(Size))
-```
-```{r}
-staff_summary %>% head(4)
-realestate_summary %>% head(4)
-```
-
----
-
-```{r}
-staff_summary %>% 
-  inner_join(realestate_summary, by = c("Bureau" = "Bureau"))
-```
-
----
-
-```{r}
-staff_summary %>% 
-  inner_join(realestate_summary, by = c("Bureau" = "Bureau")) %>% 
-  mutate(unit_area = Size/Pop) %>% 
-  arrange(unit_area)
-
 ```
 
