@@ -1,0 +1,510 @@
+---
+title: "Functions and purrr"
+author: "Abhijit Dasgupta"
+date: "March 25-27, 2019"
+output: 
+  xaringan::moon_reader:
+    css: [default, './robot.css', './robot-fonts.css']
+    #css: [default, metropolis, metropolis-fonts]
+    nature:
+      ratio: '16:9'
+      highlightLanguage: R
+      countIncrementalSlides: false
+      highlightStyle: docco
+      highlightLines: true
+      slideNumberFormat: "%current%"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, comment = "")
+```
+
+layout: true
+
+<div class="my-header">
+<span>PS 312, March 2019</span></div>
+
+---
+
+# What are functions?
+
+- Functions are a set of instructions that have been packaged up for repeated use
+- They can take single or multiple inputs
+- They can have single or multiple outputs
+
+---
+
+# Why functions?
+
+- If you need to re-use code, you could copy and paste it every time
+  - If you change the code, you will need to change every copy (yeah, right)
+  - Chances are, you won't get everything, so you introduce error
+- In a function, you change in one place and you make mistakes in one place
+  - Easier to maintain
+  - Easier to fix
+  - Changes propagate directly
+  
+---
+
+# Rule of thumb
+
+## If you have to copy-and-paste more than twice, make a function
+
+---
+
+# Creating a function
+
+We can create a new function using the word "function" followed by the functions arguments and one or more R statements.
+
+```{r}
+myDumbFunction <- function() 42
+myDumbFunction()
+```
+
+- This is a function with __no__ arguments. Usually functions have arguments, which we will see next. Here, `myDumbFunction` gives the same answer whenever it's called
+
+---
+
+# Creating a multi-statement function
+
+If there is more than one statement in a function, they should be enclosed in curly brackets:
+
+```{r}
+doubleIt <- function(x) {
+  myResult <- x * 2
+  myResult # or, explicitly, return(myResult)
+}
+doubleIt(5)
+```
+
+The last statement within the curly brackets will be the value returned by the function.
+
+- `x` is the function argument, in that it is a placeholder we can replace with an actual value when calling the function
+
+---
+
+# Functions live in their own little world
+
+Inside a function, variables that existed in your environment can be used and even changed.  However, any changes made, including changing data stored in variables and creating new variables, happens solely within the function.  Your environment stays the same.
+
+```{r}
+exists("myResult")
+myResult <- 1000
+doubleItOutput <- doubleIt(2)
+myResult
+```
+
+---
+
+```{r}
+my_sum <- function(x){
+  s <- sum(x)
+  n <- length(x)
+  result <- s / n
+  return(result)
+}
+```
+
+> Functions are objects, so you can name them and store them
+
+```{r}
+my_sum(1:10)
+```
+
+If you want to keep the results, name it
+
+```{r}
+answer <- my_sum(1:10)
+answer
+```
+
+---
+
+```{r}
+my_sum <- function(x){
+  s <- sum(x)
+  n <- length(x)
+  results<- list(sum = s, length = n, answer = s / n)
+  return(results)
+}
+```
+
+- You can only return a single object
+  - Pack all your outputs into a list
+
+```{r}
+my_sum(1:10) 
+```
+
+---
+
+```{r}
+my_sum <- function(x){
+  s <- sum(x)
+  n <- length(x)
+  results<- list(sum = s, length = n, answer = s / n)
+  return(results)
+}
+```
+
+```{r}
+answer <- my_sum(1:10)
+answer$answer
+answer[['answer']]
+names(answer)
+```
+
+---
+
+```{r}
+x <- 1:10
+x[3] <- NA
+my_sum(x)
+```
+
+---
+
+```{r}
+my_sum <- function(x){
+  s <- sum(x, na.rm=T)
+  n <- length(!is.na(x))
+  results <- list("sum" = s, "length" = n, "answer" = s/n)
+}
+my_sum(x)
+```
+
+--
+
+.center[
+NO RESULTS!!!!
+]
+---
+
+```{r}
+my_sum <- function(x){
+  s <- sum(x, na.rm = T)
+  n <- length(!is.na(x))
+  results <- list("sum" = s, "length" = n, "answer" = s/n)
+  return(results) #<<
+}
+my_sum(x)
+```
+
+--
+
+### This is still not right
+
+---
+
+```{r}
+my_sum <- function(x){
+  s <- sum(x, na.rm = T)
+{{  n <- length(!is.na(x)) }}
+  results <- list("sum" = s, "length" = n, "answer" = s/n)
+  return(results) 
+}
+```
+
+--
+
+```{r}
+my_sum <- function(x){
+  s <- sum(x, na.rm = T)
+{{  n <- sum(!is.na(x)) }}
+  results <- list("sum" = s, "length" = n, "answer" = s/n)
+  return(results) 
+}
+my_sum(x)
+```
+
+---
+
+```{r}
+my_sum <- function(x){
+  s <- sum(x, na.rm = T)
+  n <- sum(!is.na(x)) 
+  results <- list("sum" = s, "length" = n, "answer" = s/n)
+  return(results) 
+}
+```
+
+- This function will always remove missing values
+- We don't have explicit control
+  - Maybe not a good thing
+
+---
+
+```{r}
+my_sum <- function(x, remove_missing = TRUE){ #<<
+  s <- sum(x, na.rm = T)
+  n <- sum(!is.na(x)) 
+  results <- list("sum" = s, "length" = n, "answer" = s/n)
+  return(results) 
+}
+```
+
+---
+
+```{r}
+my_sum <- function(x, remove_missing = TRUE){ 
+  {{if(remove_missing){
+    x <- x[!is.na(x)]
+  }
+  s <- sum(x)
+  n <- length(x)}}
+  results <- list("sum" = s, "length" = n, "answer" = s/n)
+  return(results) 
+}
+my_sum(x)
+```
+
+---
+
+```{r}
+my_sum <- function(x, remove_missing = TRUE){ 
+  if(remove_missing){
+    x <- x[!is.na(x)]
+  }
+  s <- sum(x)
+  n <- length(x)
+  results <- list("sum" = s, "length" = n, "answer" = s/n, "nmiss" = sum(is.na(x)))
+  return(results) 
+}
+my_sum(x)
+```
+
+--
+
+.center[OOPS!!]
+
+---
+
+```{r}
+my_sum <- function(x, remove_missing = TRUE){ 
+  nmiss <- sum(is.na(x)) #<<
+  if(remove_missing){
+    x <- x[!is.na(x)]
+  }
+  s <- sum(x)
+  n <- length(x)
+  results <- list("sum" = s, "length" = n, "answer" = s/n, "nmiss" = sum(is.na(x)))
+  return(results) 
+}
+my_sum(x)
+```
+
+--
+
+.center[NOT QUITE!]
+
+---
+
+```{r}
+my_sum <- function(x, remove_missing = TRUE){ 
+  nmiss <- sum(is.na(x)) 
+  if(remove_missing){
+    x <- x[!is.na(x)]
+  }
+  s <- sum(x)
+  n <- length(x)
+  results <- list("sum" = s, "length" = n, "answer" = s/n, "nmiss" = nmiss) #<<
+  return(results) 
+}
+my_sum(x)
+```
+
+---
+
+```{r}
+my_sum(x, remove_missing = F)
+```
+
+---
+
+```{r}
+my_summary <- function(d){
+
+}
+```
+
+---
+
+```{r}
+my_summary <- function(d){
+  require(tidyverse) #<
+}
+```
+
+- You can be explicit in your package requirements
+- `require` will try to activate the package if it's installed
+---
+
+```{r}
+my_summary <- function(d){
+  require(tidyverse)
+  summary_cts <- d %>% 
+    summarize_if(is.numeric, list("mean" = ~mean(x, na.rm=T),
+                                  "median" = ~median(x, na.rm=T),
+                                  'sd' = ~sd(x, na.rm=T),
+                                  'nmiss' = ~sum(is.na(x))))
+  return(list("cts" = summary_cts))
+}
+my_summary(iris)
+```
+---
+
+```{r}
+my_summary <- function(d){
+  require(tidyverse)
+  summary_cts <- d %>% 
+    summarize_if(is.numeric, list("mean" = ~mean(x, na.rm=T),
+                                  "median" = ~median(x, na.rm=T),
+                                  'sd' = ~sd(x, na.rm=T),
+                                  'nmiss' = ~sum(is.na(x)))) %>% 
+    gather(variable, value) %>% 
+    separate(variable, c("variable","stat"), sep='_') %>% 
+    spread(stat, value)
+  return(list("cts" = summary_cts))
+}
+my_summary(iris)
+```
+
+--
+
+.center[HUH!!!]
+
+---
+
+```{r}
+my_summary <- function(d){
+  require(tidyverse)
+  summary_cts <- d %>% 
+    summarize_if(is.numeric, list("mean" = ~mean(x, na.rm=T), #<<
+                                  "median" = ~median(x, na.rm=T),#<<
+                                  'sd' = ~sd(x, na.rm=T),#<<
+                                  'nmiss' = ~sum(is.na(x)))) %>% #<<
+    gather(variable, value) %>% 
+    separate(variable, c("variable","stat"), sep='_') %>% 
+    spread(stat, value)
+  return(list("cts" = summary_cts))
+}
+my_summary(iris)
+```
+
+- Function can't find `x` inside the function
+- SO it pulls `x` from the environment
+
+---
+
+```{r}
+my_summary <- function(d){
+  require(tidyverse)
+  summary_cts <- d %>% 
+    summarize_if(is.numeric, list("mean" = ~mean(., na.rm=T),#<<
+                                  "median" = ~median(., na.rm=T),#<<
+                                  'sd' = ~sd(., na.rm=T),#<<
+                                  'nmiss' = ~sum(is.na(.)))) %>% #<<
+    gather(variable, value) %>% 
+    separate(variable, c("variable","stat"), sep='_') %>% 
+    spread(stat, value)
+  return(list("cts" = summary_cts))
+}
+my_summary(iris)
+```
+---
+
+```{r}
+my_summary <- function(d){
+  require(tidyverse)
+  summary_cts <- d %>% 
+    summarize_if(is.numeric, list("mean" = ~mean(., na.rm=T),
+                                  "median" = ~median(., na.rm=T),
+                                  'sd' = ~sd(., na.rm=T),
+                                  'nmiss' = ~sum(is.na(.)))) %>% 
+    gather(variable, value) %>% 
+    separate(variable, c("variable","stat"), sep='_') %>% 
+    spread(stat, value) %>% 
+    select(variable, nmiss, everything()) #<<
+  return(list("cts" = summary_cts))
+}
+my_summary(iris)
+```
+---
+
+```{r}
+my_summary <- function(d){
+  require(tidyverse)
+  summary_cts <- d %>% 
+    summarize_if(is.numeric, list("mean" = ~mean(., na.rm=T),
+                                  "median" = ~median(., na.rm=T),
+                                  'sd' = ~sd(., na.rm=T),
+                                  'nmiss' = ~sum(is.na(.)))) %>% 
+    gather(variable, value) %>% 
+    separate(variable, c("variable","stat"), sep='_') %>% 
+    spread(stat, value) %>% 
+    select(variable, nmiss, everything())
+  summary_cat <- d %>% #<<
+    summarise_if(is.factor, list('nmiss' = ~sum(is.na(.)),#<<
+                                 'ncat' = ~length(unique(.)),#<<
+                                 'categories' = ~paste(sort(unique(levels(.))), collapse=', ')) #<<
+                 )#<<
+  return(list("cts" = summary_cts,
+              "cat" = summary_cat))
+}
+my_summary(iris)
+```
+---
+
+```{r, eval=F}
+my_summary <- function(d){
+  require(tidyverse)
+  if(!is.data.frame(d)){#<<
+    stop("Input must be a data.frame")#<<
+  }#<<
+  summary_cts <- d %>% 
+    summarize_if(is.numeric, list("mean" = ~mean(., na.rm=T),
+                                  "median" = ~median(., na.rm=T),
+                                  'sd' = ~sd(., na.rm=T),
+                                  'nmiss' = ~sum(is.na(.)))) %>% 
+    gather(variable, value) %>% 
+    separate(variable, c("variable","stat"), sep='_') %>% 
+    spread(stat, value) %>% 
+    select(variable, nmiss, everything())
+  summary_cat <- d %>% 
+    summarise_if(is.factor, list('nmiss' = ~sum(is.na(.)),
+                                 'ncat' = ~length(unique(.)),
+                                 'categories' = ~paste(sort(unique(levels(.))), collapse=', ')) 
+                 )
+  return(list("cts" = summary_cts,
+              "cat" = summary_cat))
+}
+my_summary(x)
+```
+
+
+---
+class: middle, center
+
+# `purrr`-ing
+
+---
+
+# `purrr`
+
+__Cheatsheet__: [https://github.com/rstudio/cheatsheets/raw/master/purrr.pdf](https://github.com/rstudio/cheatsheets/raw/master/purrr.pdf)
+
+__Tutorial__: [https://jennybc.github.io/purrr-tutorial/](https://jennybc.github.io/purrr-tutorial/)
+
+
+The package `purrr` gives us the `map` function and derivatives
+
+- `map` applies a function iteratively to each element of a list or vector
+
+---
+
+```{r}
+datas <- list('cars' = mtcars, 'iris' = iris, 'diamonds'= diamonds)
+map(datas, my_summary)
+```
+
+

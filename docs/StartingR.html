@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
   <head>
     <title>Getting started with R</title>
-    <meta charset="utf-8">
+    <meta charset="utf-8" />
     <meta name="author" content="Abhijit Dasgupta" />
     <link href="site_libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link rel="stylesheet" href="robot.css" type="text/css" />
@@ -330,17 +330,9 @@ rownames(mtcars)
 ```
 
 ```
-##  [1] "Mazda RX4"           "Mazda RX4 Wag"       "Datsun 710"         
-##  [4] "Hornet 4 Drive"      "Hornet Sportabout"   "Valiant"            
-##  [7] "Duster 360"          "Merc 240D"           "Merc 230"           
-## [10] "Merc 280"            "Merc 280C"           "Merc 450SE"         
-## [13] "Merc 450SL"          "Merc 450SLC"         "Cadillac Fleetwood" 
-## [16] "Lincoln Continental" "Chrysler Imperial"   "Fiat 128"           
-## [19] "Honda Civic"         "Toyota Corolla"      "Toyota Corona"      
-## [22] "Dodge Challenger"    "AMC Javelin"         "Camaro Z28"         
-## [25] "Pontiac Firebird"    "Fiat X1-9"           "Porsche 914-2"      
-## [28] "Lotus Europa"        "Ford Pantera L"      "Ferrari Dino"       
-## [31] "Maserati Bora"       "Volvo 142E"
+##  [1] "1"  "2"  "3"  "4"  "5"  "6"  "7"  "8"  "9"  "10" "11" "12" "13" "14"
+## [15] "15" "16" "17" "18" "19" "20" "21" "22" "23" "24" "25" "26" "27" "28"
+## [29] "29" "30" "31" "32"
 ```
 
 ```r
@@ -398,7 +390,7 @@ str(mtcars)
 ```
 
 ```
-## 'data.frame':	32 obs. of  11 variables:
+## Classes 'tbl_df', 'tbl' and 'data.frame':	32 obs. of  11 variables:
 ##  $ mpg : num  21 21 22.8 21.4 18.7 18.1 14.3 24.4 22.8 19.2 ...
 ##  $ cyl : num  6 6 4 6 8 6 8 4 4 6 ...
 ##  $ disp: num  160 160 108 258 360 ...
@@ -703,6 +695,7 @@ dat &lt;- dbGetQuery(con, 'select * from &lt;table name&gt;')
 
 ![](img/db.png)
     </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
 <script>var slideshow = remark.create({
 "ratio": "16:9",
@@ -715,16 +708,57 @@ dat &lt;- dbGetQuery(con, 'select * from &lt;table name&gt;')
 if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
   window.dispatchEvent(new Event('resize'));
 });
-(function() {
-  var d = document, s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
   if (!r) return;
   s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
   d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
 })();</script>
 
 <script>
 (function() {
-  var i, text, code, codes = document.getElementsByTagName('code');
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
   for (i = 0; i < codes.length;) {
     code = codes[i];
     if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
@@ -738,7 +772,8 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
     }
     i++;
   }
-})();
+};
+slideshow._releaseMath(document);
 </script>
 <!-- dynamically load mathjax for compatibility with self-contained -->
 <script>

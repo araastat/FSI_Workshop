@@ -14,17 +14,22 @@ Last updated: `r format(Sys.time(), '%b %d, %Y (%l:%M%p %Z)')`
 
 # Getting started
 
-- [Introduction](Day1_IntroR.html)
-- [RStudio](Day1_Rstudio.html)
-- [Starting R](StartingR.html)
+- [Introduction](Day1_IntroR.html) | [pdf](Day1_IntroR.pdf)
+- [RStudio](Day1_Rstudio.html) | [pdf](Day1_Rstudio.pdf)
+- [Starting R](StartingR.html) | [pdf](StartingR.pdf)
 
 # Getting in the weeds
 
-- [Data munging](Day1_DataMunging.html)
-- [Data summaries](Day2_Summaries.html)
+- [Data munging](Day1_DataMunging.html) | [pdf](Day1_DataMunging.pdf)
+- [Data summaries](Day2_Summaries.html) | [pdf](Day2_Summaries.pdf)
 
 # Visualization
 
-- [Gallery](Gallery.html)
-- [Data visualization](Day2_DataViz.html)
-- [Publication quality graphics](lecture_pubgraphics.html)
+- [Gallery](Gallery.html) | [pdf](Gallery.pdf)
+- [Data visualization](Day2_DataViz.html) | [pdf](Day2_DataViz.pdf)
+- [Publication quality graphics](lecture_pubgraphics.html) | [pdf](lecture_pubgraphics.pdf)
+
+# Day 3
+
+- [Functions](Day3_Functions.html) | [pdf](Day3_Functions.pdf)
+- [Modeling](lecture_modeling.html) | [pdf](lecture_modeling.pdf)

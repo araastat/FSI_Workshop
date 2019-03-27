@@ -1,0 +1,78 @@
+---
+title: "Example dashboard"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(tidyverse)
+
+```
+
+Overview
+==========================
+
+Column {.tabset}
+-----------------------------------------------------------------------
+
+### mtcars
+
+```{r}
+ggplot(mtcars, aes(x = hp, y=mpg))+
+  geom_point(aes(color=factor(cyl)))+
+  geom_smooth(se = F, color='black')+
+  theme_bw() + 
+  theme(legend.position='bottom')+
+  labs(x = 'Horsepower', y = 'Miles per gallon', color='Cylinders')
+```
+
+### iris
+
+```{r}
+iris %>% 
+  ggplot(aes(x = Sepal.Length, y = Sepal.Width))+
+  geom_point(aes(color = Species))+
+  geom_smooth(se=F)+
+  geom_smooth(aes(color=Species), se=F)+
+  theme_bw()+
+  labs(x = 'Sepal length', y = 'Sepal width', color = 'Species')+
+  theme(legend.position='bottom')
+```
+
+Iris data
+=========================
+
+Column {data-width=350}
+-----------------------------------------------------------------------
+
+### Sepal length / Sepal width
+
+```{r}
+iris %>% 
+  ggplot(aes(x = Sepal.Length, y = Sepal.Width))+
+  geom_point(aes(color = Species))+
+  geom_smooth(se=F, color='black')+
+  geom_smooth(aes(color=Species), se=F)+
+  theme_bw()+
+  labs(x = 'Sepal length', y = 'Sepal width', color = 'Species')+
+  theme(legend.position='bottom')
+```
+
+
+### Sepal length / Petal length
+
+```{r}
+iris %>% 
+  ggplot(aes(x = Sepal.Length, y = Petal.Length))+
+  geom_point(aes(color = Species))+
+  geom_smooth(se=F, color='black')+
+  geom_smooth(aes(color=Species), se=F)+
+  theme_bw()+
+  labs(x = 'Sepal length', y = 'Petal length', color = 'Species')+
+  theme(legend.position='bottom')
+```
+
+
