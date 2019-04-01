@@ -181,10 +181,12 @@ NO RESULTS!!!!
 ---
 
 ```{r}
-my_sum <- function(x){
+my_sum <- function(x) {
   s <- sum(x, na.rm = T)
   n <- length(!is.na(x))
-  results <- list("sum" = s, "length" = n, "answer" = s/n)
+  results <- list("sum" = s,
+                  "length" = n,
+                  "answer" = s / n)
   return(results) #<<
 }
 my_sum(x)

@@ -11,6 +11,8 @@ navbar:
       href: lectures.html
     - text: Course notes
       href: http://www.araastat.com/FSI_Book
+    - text: Resources
+      href: resources.html
   right:
     - icon: fa-github
       text: GitHub

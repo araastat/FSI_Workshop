@@ -1,0 +1,44 @@
+---
+title: Resources
+output:
+  html_document:
+    theme: cosmo
+    highlight: textmate
+    css: styles.css
+---
+
+## Cheatsheets
+
+There are several [cheatsheets](https://www.rstudio.com/resources/cheatsheets/){target=_blank}
+provided by RStudio. 
+
+### Beginner
+
+- [RStudio](https://github.com/rstudio/cheatsheets/raw/master/rstudio-ide.pdf)
+- [Importing data](https://github.com/rstudio/cheatsheets/raw/master/data-import.pdf)
+- [Data transformation](https://github.com/rstudio/cheatsheets/raw/master/data-transformation.pdf)
+- [Data visualization](https://github.com/rstudio/cheatsheets/raw/master/data-visualization-2.1.pdf)
+
+### Advanced beginner/Intermediate
+
+- [Working with strings](https://github.com/rstudio/cheatsheets/raw/master/strings.pdf)
+- [Reporting with R Markdown](https://github.com/rstudio/cheatsheets/raw/master/rmarkdown-2.0.pdf)
+
+### Advanced
+
+- Maps
+  - [Cartography](https://github.com/rstudio/cheatsheets/raw/master/cartography.pdf)
+  - [Simple features in maps](https://github.com/rstudio/cheatsheets/raw/master/sf.pdf)
+- Text data and strings
+  - [Regular expressions](https://github.com/rstudio/cheatsheets/raw/master/regex.pdf)
+- [Machine learning](https://github.com/rstudio/cheatsheets/raw/master/caret.pdf)
+- [Package development](https://github.com/rstudio/cheatsheets/raw/master/package-development.pdf)
+
+## R with other tools
+
+We saw in the course how R can create reports to Word or HTML using R Markdown. 
+To get started on your own, you can go [here](https://rmarkdown.rstudio.com/lesson-1.html){target=_blank}
+
+
+
+

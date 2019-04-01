@@ -33,3 +33,4 @@ Last updated: `r format(Sys.time(), '%b %d, %Y (%l:%M%p %Z)')`
 
 - [Functions](Day3_Functions.html) | [pdf](Day3_Functions.pdf)
 - [Modeling](lecture_modeling.html) | [pdf](lecture_modeling.pdf)
+- [Dashboard](dashboard.html)

@@ -745,13 +745,6 @@ dataset1
 
 ```r
 library(unpivotr)
-```
-
-```
-Warning: package 'unpivotr' was built under R version 3.5.2
-```
-
-```r
 dataset1 %&gt;% 
   filter(row != 1, row != 4, row &lt; 65) %&gt;% 
   behead('N', tophead) %&gt;% 
