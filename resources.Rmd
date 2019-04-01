@@ -5,9 +5,13 @@ output:
     theme: cosmo
     highlight: textmate
     css: styles.css
+    toc: true
+    toc_float: true
 ---
 
-## Cheatsheets
+*****
+
+## Cheatsheets {#cheatsheets}
 
 There are several [cheatsheets](https://www.rstudio.com/resources/cheatsheets/){target=_blank}
 provided by RStudio. 
@@ -34,11 +38,23 @@ provided by RStudio.
 - [Machine learning](https://github.com/rstudio/cheatsheets/raw/master/caret.pdf)
 - [Package development](https://github.com/rstudio/cheatsheets/raw/master/package-development.pdf)
 
-## R with other tools
+*****
 
-We saw in the course how R can create reports to Word or HTML using R Markdown. 
-To get started on your own, you can go [here](https://rmarkdown.rstudio.com/lesson-1.html){target=_blank}
+## Books {#books}
+
+Most of the books listed have a free online version. 
+
+- R for dummies (see emailed PDF)
+- [Hands-on Programming with R](https://rstudio-education.github.io/hopr/)
+- [R for Data Science](https://r4ds.had.co.nz/){target=_blank}
+- [Data Visualization: A Practical Introduction](https://socviz.co/)
+- [R Markdown: The Definitive Guide](https://bookdown.org/yihui/rmarkdown/)
 
 
+*****
 
+## More in-depth raining resources
 
+- [DataCamp](https://www.datacamp.com/courses/free-introduction-to-r)
+- [PluralSight](https://www.pluralsight.com/search?q=R)
+- [Coursera](https://www.coursera.org)'s [Data Science Specialization](https://www.coursera.org/specializations/jhu-data-science)

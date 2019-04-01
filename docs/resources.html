@@ -19,6 +19,9 @@
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
@@ -267,6 +270,101 @@ $(document).ready(function () {
 
 
 
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+  padding-left: 25px;
+  text-indent: 0;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
 
 
 <div class="navbar navbar-default  navbar-fixed-top" role="navigation">
@@ -319,6 +417,7 @@ $(document).ready(function () {
 </div>
 
 
+<hr />
 <div id="cheatsheets" class="section level2">
 <h2>Cheatsheets</h2>
 <p>There are several <a href="https://www.rstudio.com/resources/cheatsheets/" target="_blank">cheatsheets</a> provided by RStudio.</p>
@@ -353,15 +452,34 @@ $(document).ready(function () {
 <li><a href="https://github.com/rstudio/cheatsheets/raw/master/caret.pdf">Machine learning</a></li>
 <li><a href="https://github.com/rstudio/cheatsheets/raw/master/package-development.pdf">Package development</a></li>
 </ul>
+<hr />
 </div>
 </div>
-<div id="r-with-other-tools" class="section level2">
-<h2>R with other tools</h2>
-<p>We saw in the course how R can create reports to Word or HTML using R Markdown. To get started on your own, you can go <a href="https://rmarkdown.rstudio.com/lesson-1.html" target="_blank">here</a></p>
+<div id="books" class="section level2">
+<h2>Books</h2>
+<p>Most of the books listed have a free online version.</p>
+<ul>
+<li>R for dummies (see emailed PDF)</li>
+<li><a href="https://rstudio-education.github.io/hopr/">Hands-on Programming with R</a></li>
+<li><a href="https://r4ds.had.co.nz/" target="_blank">R for Data Science</a></li>
+<li><a href="https://socviz.co/">Data Visualization: A Practical Introduction</a></li>
+<li><a href="https://bookdown.org/yihui/rmarkdown/">R Markdown: The Definitive Guide</a></li>
+</ul>
+<hr />
+</div>
+<div id="more-in-depth-raining-resources" class="section level2">
+<h2>More in-depth raining resources</h2>
+<ul>
+<li><a href="https://www.datacamp.com/courses/free-introduction-to-r">DataCamp</a></li>
+<li><a href="https://www.pluralsight.com/search?q=R">PluralSight</a></li>
+<li><a href="https://www.coursera.org">Coursera</a>’s <a href="https://www.coursera.org/specializations/jhu-data-science">Data Science Specialization</a></li>
+</ul>
 </div>
 
 
 
+</div>
+</div>
 
 </div>
 
